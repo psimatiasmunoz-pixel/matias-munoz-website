@@ -302,7 +302,7 @@
 
     .suite-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 18px;
     }
 
@@ -478,6 +478,7 @@
         <div class="hero-points">
           <span class="hero-point">16PF-5 automatizado</span>
           <span class="hero-point">Lüscher abreviado</span>
+          <span class="hero-point">DASS-21</span>
           <span class="hero-point">Rorschach Exner</span>
         </div>
       </article>
@@ -552,6 +553,24 @@
           <span>Notas clínicas</span>
         </div>
         <a class="suite-link" href="luscher/" data-suite-link>Abrir instrumento →</a>
+      </article>
+
+      <article class="suite-card is-locked" data-suite-card>
+        <div class="suite-card-top">
+          <div class="suite-icon">D</div>
+          <span class="suite-status" data-suite-status>Bloqueado</span>
+        </div>
+        <h4>DASS-21</h4>
+        <p>
+          Escala breve de depresion, ansiedad y estres con 21 items,
+          calculo automatico por subescala y bandas de severidad clinicas.
+        </p>
+        <div class="suite-meta">
+          <span>21 items</span>
+          <span>Subescalas x3</span>
+          <span>Tamizaje emocional</span>
+        </div>
+        <a class="suite-link" href="dass21/" data-suite-link>Abrir instrumento -></a>
       </article>
 
       <article class="suite-card is-locked" data-suite-card>

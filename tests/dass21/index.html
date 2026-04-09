@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="DASS-21 digital para tamizaje de depresion, ansiedad y estres.">
+<title>DASS-21 - Escala de Depresion, Ansiedad y Estres</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#08111a;--bg2:#0f1d2a;--bg3:#142737;--bg4:#1a3245;
+  --surface:rgba(255,255,255,.04);--border:rgba(255,255,255,.1);--border-soft:rgba(255,255,255,.06);
+  --text:#edf5f7;--text2:#b6c7cf;--text3:#78909c;
+  --primary:#10a39d;--primary2:#6fe0d9;--accent:#d4982a;
+  --danger:#ef6c7a;--danger-soft:rgba(239,108,122,.16);
+  --warn:#f2b94b;--warn-soft:rgba(242,185,75,.16);
+  --ok:#63d79b;--ok-soft:rgba(99,215,155,.16);
+  --radius:14px;--radius-lg:22px;--shadow:0 18px 60px rgba(0,0,0,.32)
+}
+body{
+  font-family:'Inter',sans-serif;min-height:100vh;color:var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(16,163,157,.14), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(212,152,42,.10), transparent 28%),
+    linear-gradient(135deg, #071019 0%, #0c1822 45%, #102638 100%)
+}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:linear-gradient(180deg, rgba(255,255,255,.015), rgba(255,255,255,0))}
+.shell{max-width:1100px;margin:0 auto;padding:32px 20px 56px;position:relative;z-index:1}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:22px;margin-bottom:22px}
+.card{background:rgba(9,27,39,.78);border:1px solid var(--border-soft);border-radius:var(--radius-lg);box-shadow:var(--shadow);backdrop-filter:blur(14px)}
+.hero-main{padding:34px;position:relative;overflow:hidden}
+.hero-main::after{content:'';position:absolute;width:260px;height:260px;right:-80px;top:-90px;border-radius:50%;background:radial-gradient(circle, rgba(16,163,157,.26) 0%, rgba(16,163,157,0) 72%)}
+.badge{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px;background:rgba(16,163,157,.12);border:1px solid rgba(16,163,157,.24);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#b9f1ed;margin-bottom:18px}
+.hero-title{font-size:clamp(2.2rem, 5vw, 4rem);line-height:1.02;font-weight:800;letter-spacing:-.04em;max-width:11ch;margin-bottom:14px}
+.hero-copy{max-width:58ch;color:var(--text2);line-height:1.75;font-size:1rem}
+.hero-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:24px}
+.hero-item{padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);font-size:13px;color:var(--text2)}
+.hero-side{padding:28px}
+.hero-side h2{font-size:1.15rem;font-weight:700;margin-bottom:12px}
+.hero-side p{color:var(--text2);line-height:1.7;font-size:.95rem}
+.scale-grid{display:grid;gap:10px;margin-top:18px}
+.scale-item{padding:14px 15px;border-radius:16px;border:1px solid var(--border);background:var(--surface)}
+.scale-item strong{display:block;font-size:13px;margin-bottom:4px}
+.scale-item span{font-size:12px;color:var(--text3)}
+.panel{padding:26px}
+.panel-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:18px}
+.panel-title{font-size:1.35rem;font-weight:700}
+.panel-subtitle{max-width:62ch;color:var(--text2);line-height:1.7;font-size:.95rem}
+.hidden{display:none!important}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+.field label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em}
+.field input,.field select,.field textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font:inherit}
+.field textarea{min-height:86px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(16,163,157,.12)}
+.note{margin-top:16px;padding:16px;border-radius:16px;background:rgba(212,152,42,.11);border:1px solid rgba(212,152,42,.16);color:#f1dfbb;font-size:13px;line-height:1.7}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:13px 18px;border:none;border-radius:999px;cursor:pointer;font:inherit;font-weight:700;transition:transform .2s ease, opacity .2s ease, background .2s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{color:#082129;background:linear-gradient(135deg,#91ebe3 0%, #d8b365 100%);box-shadow:0 14px 28px rgba(11,122,117,.25)}
+.btn-secondary{color:var(--text);background:rgba(255,255,255,.07);border:1px solid var(--border)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.scale-help{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.help-chip{padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--border-soft);text-align:center;font-size:12px;color:var(--text2);line-height:1.5}
+.help-chip strong{display:block;color:var(--text);font-size:13px;margin-bottom:4px}
+.progress-head{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:16px}
+.progress-meta{font-size:13px;color:var(--text2)}
+.progress-bar{height:6px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:18px}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .25s ease}
+.question-list{display:grid;gap:14px}
+.question-card{padding:18px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}
+.question-card.answered{border-color:rgba(16,163,157,.26);background:rgba(16,163,157,.06)}
+.question-top{display:flex;justify-content:space-between;gap:12px;margin-bottom:10px}
+.question-number{font-size:12px;font-weight:700;color:var(--primary2);letter-spacing:.08em;text-transform:uppercase}
+.question-scale{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:8px 10px;border-radius:999px}
+.question-scale.stress{background:rgba(242,185,75,.14);color:#ffd995}
+.question-scale.anxiety{background:rgba(239,108,122,.14);color:#ffb4be}
+.question-scale.depression{background:rgba(99,215,155,.14);color:#bdf3d0}
+.question-text{font-size:15px;line-height:1.7;color:var(--text);margin-bottom:14px}
+.option-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.option{position:relative;padding:12px;border-radius:14px;border:1px solid var(--border);background:rgba(255,255,255,.03);cursor:pointer;transition:all .2s ease;min-height:86px}
+.option:hover{border-color:rgba(16,163,157,.32);background:rgba(16,163,157,.06)}
+.option input{position:absolute;opacity:0;pointer-events:none}
+.option-label{display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px}
+.option-desc{display:block;font-size:12px;line-height:1.55;color:var(--text2)}
+.option.active{border-color:rgba(16,163,157,.5);background:rgba(16,163,157,.12);box-shadow:inset 0 0 0 1px rgba(16,163,157,.24)}
+.results-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:16px}
+.result-card{padding:18px;border-radius:18px;border:1px solid var(--border);background:rgba(255,255,255,.04)}
+.result-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
+.result-head h3{font-size:1rem;font-weight:700}
+.score-pill{padding:9px 12px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.05em}
+.score-pill.normal{background:var(--ok-soft);color:#aef3c9}
+.score-pill.mild{background:rgba(121,201,255,.16);color:#b9e4ff}
+.score-pill.moderate{background:var(--warn-soft);color:#ffe1a6}
+.score-pill.severe{background:rgba(255,146,76,.16);color:#ffc597}
+.score-pill.extremely-severe{background:var(--danger-soft);color:#ffbcc6}
+.score-values{display:flex;gap:12px;align-items:flex-end;margin-bottom:12px}
+.score-values strong{font-size:2.2rem;line-height:1}
+.score-values span{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.score-bar{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:12px}
+.score-bar>div{height:100%;width:0;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .5s ease}
+.result-copy{font-size:13px;line-height:1.7;color:var(--text2)}
+.report-block{padding:18px;border-radius:18px;border:1px solid var(--border);background:rgba(255,255,255,.04);margin-top:14px}
+.report-block h4{font-size:1rem;font-weight:700;margin-bottom:10px}
+.report-block p,.report-block li{font-size:13px;line-height:1.75;color:var(--text2)}
+.report-list{padding-left:18px}
+.report-list li{margin-bottom:6px}
+.patient-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.summary-item{padding:14px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--border-soft)}
+.summary-item span{display:block;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.summary-item strong{font-size:13px;color:var(--text)}
+.footer-note{margin-top:16px;font-size:12px;color:var(--text3);line-height:1.7}
+@media print{
+  body{background:#fff;color:#111}
+  body::before,.suite-toolbar,.no-print{display:none!important}
+  .card,.result-card,.report-block,.question-card,.summary-item,.help-chip,.scale-item{background:#fff!important;color:#111!important;box-shadow:none}
+  .shell{padding:0}
+}
+@media (max-width:900px){
+  .hero,.results-grid,.patient-summary,.scale-help{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+}
+@media (max-width:720px){
+  .shell{padding:18px 12px 42px}
+  .hero-main,.hero-side,.panel{padding:20px}
+  .option-grid,.hero-list{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <section class="hero">
+    <article class="card hero-main">
+      <div class="badge">Tamizaje emocional breve</div>
+      <h1 class="hero-title">DASS-21 digital.</h1>
+      <p class="hero-copy">
+        Escala breve para estimar niveles recientes de depresion, ansiedad y estres durante la ultima semana.
+        El reporte automatiza el puntaje por subescala, la equivalencia de severidad y una sintesis clinica orientativa.
+      </p>
+      <div class="hero-list">
+        <div class="hero-item">21 items con respuesta de 0 a 3 segun frecuencia o intensidad.</div>
+        <div class="hero-item">Subescalas independientes: depresion, ansiedad y estres.</div>
+        <div class="hero-item">Puntaje final ajustado multiplicando por 2 para equivalencia DASS completa.</div>
+        <div class="hero-item">Util como tamizaje. No reemplaza evaluacion diagnostica profesional.</div>
+      </div>
+    </article>
+    <aside class="card hero-side">
+      <h2>Escala de respuesta</h2>
+      <p>Indica cuanto se aplico cada afirmacion a la persona evaluada durante la ultima semana.</p>
+      <div class="scale-grid">
+        <div class="scale-item"><strong>0</strong><span>No me sucedio.</span></div>
+        <div class="scale-item"><strong>1</strong><span>Me sucedio un poco o durante parte del tiempo.</span></div>
+        <div class="scale-item"><strong>2</strong><span>Me sucedio bastante o durante buena parte del tiempo.</span></div>
+        <div class="scale-item"><strong>3</strong><span>Me sucedio mucho o la mayor parte del tiempo.</span></div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="card panel" id="stepIntro">
+    <div class="panel-head">
+      <div><div class="panel-title">Datos de aplicacion</div></div>
+      <div class="panel-subtitle">Completa los antecedentes basicos antes de administrar la escala. El formulario usa la version corta DASS-21 y calcula cada subescala por separado.</div>
+    </div>
+    <div class="form-grid">
+      <div class="field"><label>Nombre o codigo</label><input type="text" id="pName" placeholder="Paciente o identificador"></div>
+      <div class="field"><label>Edad</label><input type="number" id="pAge" min="12" max="99" placeholder="Edad"></div>
+      <div class="field"><label>Fecha</label><input type="date" id="pDate"></div>
+      <div class="field"><label>Evaluador</label><input type="text" id="pEval" placeholder="Profesional responsable"></div>
+      <div class="field full"><label>Contexto de evaluacion</label><input type="text" id="pContext" placeholder="Clinico, deportivo, vocacional, seguimiento, etc."></div>
+      <div class="field full"><label>Observaciones iniciales</label><textarea id="pObs" placeholder="Antecedentes de aplicacion, motivo de consulta o contexto breve"></textarea></div>
+    </div>
+    <div class="note">
+      Instrumento de tamizaje autoinformado. Si aparecen puntuaciones elevadas, deben integrarse con entrevista clinica,
+      antecedentes, observacion y otras fuentes de evaluacion antes de extraer conclusiones.
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="startBtn">Iniciar DASS-21</button>
+    </div>
+  </section>
+
+  <section class="card panel hidden" id="stepTest">
+    <div class="panel-head">
+      <div><div class="panel-title">Aplicacion</div></div>
+      <div class="panel-subtitle">Responde las 21 afirmaciones segun la ultima semana. El avance se completa cuando cada item tiene una respuesta seleccionada.</div>
+    </div>
+    <div class="scale-help">
+      <div class="help-chip"><strong>0</strong>No me sucedio</div>
+      <div class="help-chip"><strong>1</strong>Me sucedio un poco</div>
+      <div class="help-chip"><strong>2</strong>Me sucedio bastante</div>
+      <div class="help-chip"><strong>3</strong>Me sucedio mucho</div>
+    </div>
+    <div class="progress-head">
+      <div class="progress-meta" id="progressText">0 de 21 respuestas completadas</div>
+      <div class="progress-meta" id="progressPct">0%</div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="question-list" id="questionList"></div>
+    <div class="actions no-print">
+      <button class="btn btn-secondary" id="backBtn">Volver a datos</button>
+      <button class="btn btn-primary" id="finishBtn" disabled>Calcular resultados</button>
+    </div>
+  </section>
+
+  <section class="card panel hidden" id="stepResults">
+    <div class="panel-head">
+      <div><div class="panel-title">Informe DASS-21</div></div>
+      <div class="panel-subtitle">Resultados ajustados segun equivalencia DASS completa. Las bandas de severidad se interpretan de forma independiente para cada subescala.</div>
+    </div>
+    <div class="patient-summary" id="patientSummary"></div>
+    <div class="results-grid" id="resultsGrid"></div>
+    <div class="report-block">
+      <h4>Sintesis clinica orientativa</h4>
+      <p id="summaryText"></p>
+    </div>
+    <div class="report-block">
+      <h4>Alertas y consideraciones</h4>
+      <ul class="report-list" id="alertsList"></ul>
+    </div>
+    <div class="report-block">
+      <h4>Observaciones del evaluador</h4>
+      <p id="obsText"></p>
+    </div>
+    <p class="footer-note">
+      Fuente de aplicacion: formulario DASS-21 distribuido por UNSW. El sitio oficial indica que los formularios pueden descargarse y copiarse sin restriccion,
+      y que la version DASS-21 se puntua sumando los items de cada subescala y multiplicando el subtotal por 2.
+    </p>
+    <div class="actions no-print">
+      <button class="btn btn-primary" onclick="window.print()">Imprimir informe</button>
+      <button class="btn btn-secondary" id="restartBtn">Nueva aplicacion</button>
+    </div>
+  </section>
+</div>
+
+<script src="../assets/suite-access.js" data-suite-guard="true" data-suite-home="../" data-landing-href="../../index.html"></script>
+<script>
+const ITEMS = [
+  { id: 1, scale: 'stress', text: 'Me costo mucho relajarme.' },
+  { id: 2, scale: 'anxiety', text: 'Me di cuenta que tenia la boca seca.' },
+  { id: 3, scale: 'depression', text: 'No podia sentir ningun sentimiento positivo.' },
+  { id: 4, scale: 'anxiety', text: 'Se me hizo dificil respirar (por ejemplo, respiracion demasiado rapida o falta de aire sin esfuerzo fisico).' },
+  { id: 5, scale: 'depression', text: 'Se me hizo dificil tomar la iniciativa para hacer cosas.' },
+  { id: 6, scale: 'stress', text: 'Reaccione exageradamente en ciertas situaciones.' },
+  { id: 7, scale: 'anxiety', text: 'Tuve temblores (por ejemplo, en las manos).' },
+  { id: 8, scale: 'stress', text: 'Senti que tenia muchos nervios.' },
+  { id: 9, scale: 'anxiety', text: 'Estuve preocupado por situaciones en las cuales podia entrar en panico y hacer el ridiculo.' },
+  { id: 10, scale: 'depression', text: 'Senti que no tenia nada por lo que ilusionarme.' },
+  { id: 11, scale: 'stress', text: 'Me senti agitado.' },
+  { id: 12, scale: 'stress', text: 'Se me hizo dificil relajarme.' },
+  { id: 13, scale: 'depression', text: 'Me senti triste y deprimido.' },
+  { id: 14, scale: 'stress', text: 'No tolere nada que no me permitiera continuar con lo que estaba haciendo.' },
+  { id: 15, scale: 'anxiety', text: 'Senti que estaba cercano a sentir panico.' },
+  { id: 16, scale: 'depression', text: 'No me pude entusiasmar por nada.' },
+  { id: 17, scale: 'depression', text: 'Senti que valia muy poco como persona.' },
+  { id: 18, scale: 'stress', text: 'Senti que estaba muy irritable.' },
+  { id: 19, scale: 'anxiety', text: 'Senti la actividad de mi corazon a pesar de no haber hecho esfuerzo fisico.' },
+  { id: 20, scale: 'anxiety', text: 'Tuve miedo sin razon.' },
+  { id: 21, scale: 'depression', text: 'Senti que la vida no tenia ningun sentido.' }
+];
+
+const OPTIONS = [
+  { value: 0, title: '0', desc: 'No me sucedio' },
+  { value: 1, title: '1', desc: 'Me sucedio un poco' },
+  { value: 2, title: '2', desc: 'Me sucedio bastante' },
+  { value: 3, title: '3', desc: 'Me sucedio mucho' }
+];
+
+const SCALES = {
+  depression: {
+    label: 'Depresion',
+    max: 42,
+    classes: [
+      { max: 9, label: 'Normal' },
+      { max: 13, label: 'Leve' },
+      { max: 20, label: 'Moderada' },
+      { max: 27, label: 'Severa' },
+      { max: Infinity, label: 'Extremadamente severa' }
+    ],
+    summary: {
+      normal: 'No aparecen indicadores elevados de animo depresivo dentro de esta escala.',
+      leve: 'Se observan senales iniciales de desmotivacion o bajo afecto positivo.',
+      moderada: 'El malestar depresivo alcanza una intensidad clinicamente relevante y conviene profundizar evaluacion.',
+      severa: 'La carga depresiva es alta y sugiere un impacto importante en motivacion, autoestima o sentido vital.',
+      'extremadamente severa': 'La elevacion depresiva es muy marcada y requiere valoracion clinica prioritaria.'
+    }
+  },
+  anxiety: {
+    label: 'Ansiedad',
+    max: 42,
+    classes: [
+      { max: 7, label: 'Normal' },
+      { max: 9, label: 'Leve' },
+      { max: 14, label: 'Moderada' },
+      { max: 19, label: 'Severa' },
+      { max: Infinity, label: 'Extremadamente severa' }
+    ],
+    summary: {
+      normal: 'No se aprecian signos elevados de activacion ansiosa en esta medicion.',
+      leve: 'Hay indicadores iniciales de tension fisiologica o temor anticipatorio.',
+      moderada: 'La ansiedad alcanza un rango clinico relevante y conviene revisar detonantes y estrategias de afrontamiento.',
+      severa: 'La activacion ansiosa es alta, con probables manifestaciones fisiologicas o miedo intenso.',
+      'extremadamente severa': 'La ansiedad aparece muy elevada y amerita exploracion clinica cuidadosa y oportuna.'
+    }
+  },
+  stress: {
+    label: 'Estres',
+    max: 42,
+    classes: [
+      { max: 14, label: 'Normal' },
+      { max: 18, label: 'Leve' },
+      { max: 25, label: 'Moderada' },
+      { max: 33, label: 'Severa' },
+      { max: Infinity, label: 'Extremadamente severa' }
+    ],
+    summary: {
+      normal: 'No se observan niveles elevados de tension, irritabilidad o sobrecarga general.',
+      leve: 'Existe cierta sobrecarga o dificultad de relajacion, aun en rango bajo.',
+      moderada: 'Se aprecia tension sostenida, irritabilidad o dificultad para bajar activacion.',
+      severa: 'El estres alcanza una magnitud alta y probablemente esta interfiriendo en el funcionamiento cotidiano.',
+      'extremadamente severa': 'La sobrecarga es muy marcada y sugiere necesidad de intervencion prioritaria.'
+    }
+  }
+};
+
+const SCALE_CLASS = {
+  'Normal': 'normal',
+  'Leve': 'mild',
+  'Moderada': 'moderate',
+  'Severa': 'severe',
+  'Extremadamente severa': 'extremely-severe'
+};
+
+const answers = {};
+
+function $(id){ return document.getElementById(id); }
+
+function renderQuestions() {
+  $('questionList').innerHTML = ITEMS.map((item) => `
+    <article class="question-card" id="question-${item.id}">
+      <div class="question-top">
+        <span class="question-number">Item ${item.id}</span>
+        <span class="question-scale ${item.scale}">${SCALES[item.scale].label}</span>
+      </div>
+      <p class="question-text">${item.text}</p>
+      <div class="option-grid">
+        ${OPTIONS.map((option) => `
+          <label class="option" data-item="${item.id}" data-value="${option.value}">
+            <input type="radio" name="item-${item.id}" value="${option.value}">
+            <span class="option-label">${option.title}</span>
+            <span class="option-desc">${option.desc}</span>
+          </label>
+        `).join('')}
+      </div>
+    </article>
+  `).join('');
+
+  document.querySelectorAll('.option').forEach((optionEl) => {
+    optionEl.addEventListener('click', () => {
+      const itemId = Number(optionEl.dataset.item);
+      const value = Number(optionEl.dataset.value);
+      answers[itemId] = value;
+      document.querySelectorAll(`.option[data-item="${itemId}"]`).forEach((peer) => {
+        peer.classList.toggle('active', peer === optionEl);
+        peer.querySelector('input').checked = peer === optionEl;
+      });
+      $(`question-${itemId}`).classList.add('answered');
+      updateProgress();
+    });
+  });
+}
+
+function updateProgress() {
+  const answered = Object.keys(answers).length;
+  const pct = Math.round((answered / ITEMS.length) * 100);
+  $('progressText').textContent = `${answered} de ${ITEMS.length} respuestas completadas`;
+  $('progressPct').textContent = `${pct}%`;
+  $('progressFill').style.width = `${pct}%`;
+  $('finishBtn').disabled = answered !== ITEMS.length;
+}
+
+function startTest() {
+  $('stepIntro').classList.add('hidden');
+  $('stepTest').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBack() {
+  $('stepTest').classList.add('hidden');
+  $('stepIntro').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function getSeverity(scaleKey, score) {
+  return SCALES[scaleKey].classes.find((entry) => score <= entry.max).label;
+}
+
+function scoreScale(scaleKey) {
+  const relevant = ITEMS.filter((item) => item.scale === scaleKey);
+  const raw = relevant.reduce((acc, item) => acc + Number(answers[item.id] || 0), 0);
+  const adjusted = raw * 2;
+  const severity = getSeverity(scaleKey, adjusted);
+  return { raw, adjusted, severity };
+}
+
+function summarySentence(results) {
+  const ranked = Object.entries(results).sort((a, b) => b[1].adjusted - a[1].adjusted);
+  const top = ranked[0];
+  const labels = ranked.map(([key, value]) => `${SCALES[key].label}: ${value.severity.toLowerCase()}`);
+  return `La configuracion actual muestra mayor elevacion en ${SCALES[top[0]].label.toLowerCase()} (${top[1].severity.toLowerCase()}). Subescalas: ${labels.join(', ')}.`;
+}
+
+function alertsFor(results) {
+  const alerts = [];
+  const elevated = Object.entries(results).filter(([, value]) => !['Normal', 'Leve'].includes(value.severity));
+  if (!elevated.length) {
+    alerts.push('Las tres subescalas se mantienen en rango normal o leve. Aun asi, el resultado debe integrarse con entrevista y contexto clinico.');
+  } else {
+    alerts.push('Existen elevaciones moderadas o superiores que justifican profundizar con entrevista clinica y revision funcional de sintomas recientes.');
+  }
+  if (Object.values(results).some((value) => ['Severa', 'Extremadamente severa'].includes(value.severity))) {
+    alerts.push('Al menos una subescala se ubica en rango severo o extremadamente severo. Conviene priorizar seguimiento profesional cercano.');
+  }
+  if (results.anxiety.adjusted >= 15) {
+    alerts.push('La ansiedad elevada puede acompanarse de hiperactivacion fisiologica, temor anticipatorio o episodios de panico. Conviene explorar detonantes y manejo somatico.');
+  }
+  if (results.stress.adjusted >= 19) {
+    alerts.push('El estres elevado sugiere dificultad para relajarse, irritabilidad o sensacion de sobrecarga persistente durante la ultima semana.');
+  }
+  if (results.depression.adjusted >= 14) {
+    alerts.push('La depresion elevada sugiere revisar perdida de interes, animo bajo, autovaloracion y sentido vital con entrevista clinica complementaria.');
+  }
+  alerts.push('Este instrumento es de tamizaje. No entrega diagnostico por si mismo ni reemplaza juicio clinico profesional.');
+  return alerts;
+}
+
+function renderPatientSummary() {
+  const entries = [
+    ['Paciente / codigo', $('pName').value.trim() || 'No consignado'],
+    ['Edad', $('pAge').value.trim() || 'No consignada'],
+    ['Fecha', $('pDate').value || new Date().toISOString().slice(0, 10)],
+    ['Evaluador', $('pEval').value.trim() || 'No consignado'],
+    ['Contexto', $('pContext').value.trim() || 'No consignado'],
+    ['Respuestas', `${Object.keys(answers).length} de 21`]
+  ];
+  $('patientSummary').innerHTML = entries.map(([label, value]) => `
+    <div class="summary-item">
+      <span>${label}</span>
+      <strong>${value}</strong>
+    </div>
+  `).join('');
+}
+
+function renderResults(results) {
+  $('resultsGrid').innerHTML = Object.entries(results).map(([key, data]) => {
+    const config = SCALES[key];
+    const width = Math.min(100, (data.adjusted / config.max) * 100);
+    const tone = SCALE_CLASS[data.severity];
+    const summary = config.summary[data.severity.toLowerCase()];
+    return `
+      <article class="result-card">
+        <div class="result-head">
+          <h3>${config.label}</h3>
+          <span class="score-pill ${tone}">${data.severity}</span>
+        </div>
+        <div class="score-values">
+          <strong>${data.adjusted}</strong>
+          <span>Puntaje ajustado<br>Raw ${data.raw}</span>
+        </div>
+        <div class="score-bar"><div style="width:${width}%"></div></div>
+        <p class="result-copy">${summary}</p>
+      </article>
+    `;
+  }).join('');
+}
+
+function calculateResults() {
+  const results = {
+    depression: scoreScale('depression'),
+    anxiety: scoreScale('anxiety'),
+    stress: scoreScale('stress')
+  };
+  renderPatientSummary();
+  renderResults(results);
+  $('summaryText').textContent = summarySentence(results);
+  $('alertsList').innerHTML = alertsFor(results).map((item) => `<li>${item}</li>`).join('');
+  $('obsText').textContent = $('pObs').value.trim() || 'Sin observaciones registradas por el evaluador.';
+  $('stepTest').classList.add('hidden');
+  $('stepResults').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetAll() {
+  Object.keys(answers).forEach((key) => delete answers[key]);
+  document.querySelectorAll('input[type="radio"]').forEach((input) => { input.checked = false; });
+  document.querySelectorAll('.option').forEach((option) => option.classList.remove('active'));
+  document.querySelectorAll('.question-card').forEach((card) => card.classList.remove('answered'));
+  updateProgress();
+  $('stepResults').classList.add('hidden');
+  $('stepTest').classList.add('hidden');
+  $('stepIntro').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function init() {
+  $('pDate').value = new Date().toISOString().slice(0, 10);
+  renderQuestions();
+  updateProgress();
+  $('startBtn').addEventListener('click', startTest);
+  $('backBtn').addEventListener('click', goBack);
+  $('finishBtn').addEventListener('click', calculateResults);
+  $('restartBtn').addEventListener('click', resetAll);
+}
+
+init();
+</script>
+</body>
+</html>
