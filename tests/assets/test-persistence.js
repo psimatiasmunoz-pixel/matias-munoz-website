@@ -128,14 +128,33 @@
       };
     }
 
+    const requestBody = {
+      rootFolderName: envelope.drive_root_folder,
+      patientFolderName: envelope.patient_slug,
+      payload: envelope
+    };
+
+    // Google Apps Script web apps commonly reject browser preflight requests.
+    // Send a simple opaque POST so the request can still reach doPost from GitHub Pages.
+    if (/script\.google\.com\/macros\/s\//i.test(driveWebhookUrl)) {
+      await fetch(driveWebhookUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(requestBody)
+      });
+
+      return {
+        status: 'submitted',
+        message: 'drive request submitted from browser',
+        path: envelope.drive_target_path
+      };
+    }
+
     const response = await fetch(driveWebhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        rootFolderName: envelope.drive_root_folder,
-        patientFolderName: envelope.patient_slug,
-        payload: envelope
-      })
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {
@@ -233,19 +252,31 @@
       }
     }
 
-    const driveSaved = driveResult.status === 'synced';
+    const driveSaved = driveResult.status === 'synced' || driveResult.status === 'submitted';
     const supabaseSaved = Boolean(supabaseRows);
     const anySaved = driveSaved || supabaseSaved;
 
     if (!settings.silent) {
       if (driveSaved && !supabaseEnabled) {
-        toast('Resultados enviados a Drive. Supabase queda pendiente.', 'success');
+        if (driveResult.status === 'submitted') {
+          toast('Resultados enviados a Drive para procesamiento. Supabase queda pendiente.', 'success');
+        } else {
+          toast('Resultados enviados a Drive. Supabase queda pendiente.', 'success');
+        }
       } else if (driveSaved && supabaseError) {
-        toast('Resultados enviados a Drive. Supabase sigue pendiente.', 'warn');
+        if (driveResult.status === 'submitted') {
+          toast('Resultados enviados a Drive para procesamiento. Supabase sigue pendiente.', 'warn');
+        } else {
+          toast('Resultados enviados a Drive. Supabase sigue pendiente.', 'warn');
+        }
       } else if (driveResult.status === 'error' && supabaseSaved) {
         toast('Guardado en Supabase, pero la sync a Drive fallo.', 'warn');
       } else if (driveSaved && supabaseSaved) {
-        toast('Resultados guardados en Supabase y enviados a Drive.', 'success');
+        if (driveResult.status === 'submitted') {
+          toast('Resultados guardados en Supabase y enviados a Drive para procesamiento.', 'success');
+        } else {
+          toast('Resultados guardados en Supabase y enviados a Drive.', 'success');
+        }
       } else if (supabaseSaved) {
         toast('Resultados guardados en Supabase.', 'success');
       } else if (driveResult.status === 'error') {
