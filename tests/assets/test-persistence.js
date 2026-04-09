@@ -22,6 +22,10 @@
     return window.__PSY_DRIVE_ROOT_FOLDER || DEFAULT_ROOT_DRIVE_FOLDER;
   }
 
+  function isSupabaseEnabled() {
+    return window.__PSY_ENABLE_SUPABASE !== false;
+  }
+
   function slugify(value) {
     return String(value || 'sin_nombre')
       .normalize('NFD')
@@ -175,11 +179,14 @@
   async function saveRecord(payload, options) {
     const settings = options || {};
     const envelope = buildEnvelope(payload);
+    const supabaseEnabled = isSupabaseEnabled();
     let driveResult = {
       status: 'skipped',
       message: 'drive webhook not configured',
       path: envelope.drive_target_path
     };
+    let supabaseRows = null;
+    let supabaseError = null;
 
     try {
       driveResult = await syncToDrive(envelope);
@@ -195,22 +202,59 @@
     envelope.drive_sync_message = driveResult.message;
     envelope.drive_target_path = driveResult.path || envelope.drive_target_path;
 
-    const supabaseRows = await saveToSupabase(envelope);
+    if (supabaseEnabled) {
+      try {
+        supabaseRows = await saveToSupabase(envelope);
+      } catch (error) {
+        supabaseError = error;
+      }
+    }
+
+    const driveSaved = driveResult.status === 'synced';
+    const supabaseSaved = Boolean(supabaseRows);
+    const anySaved = driveSaved || supabaseSaved;
 
     if (!settings.silent) {
-      if (driveResult.status === 'error') {
+      if (driveSaved && !supabaseEnabled) {
+        toast('Resultados enviados a Drive. Supabase queda pendiente.', 'success');
+      } else if (driveSaved && supabaseError) {
+        toast('Resultados enviados a Drive. Supabase sigue pendiente.', 'warn');
+      } else if (driveResult.status === 'error' && supabaseSaved) {
         toast('Guardado en Supabase, pero la sync a Drive fallo.', 'warn');
-      } else if (driveResult.status === 'synced') {
+      } else if (driveSaved && supabaseSaved) {
         toast('Resultados guardados en Supabase y enviados a Drive.', 'success');
-      } else {
+      } else if (supabaseSaved) {
         toast('Resultados guardados en Supabase.', 'success');
+      } else if (driveResult.status === 'error') {
+        toast('No se pudo guardar el resultado ni en Drive ni en Supabase.', 'error');
+      } else {
+        toast('No hay un destino de guardado configurado.', 'warn');
       }
+    }
+
+    if (!anySaved) {
+      const parts = [];
+      if (driveResult.status === 'error') {
+        parts.push(driveResult.message);
+      }
+      if (supabaseError) {
+        parts.push(supabaseError.message);
+      }
+      if (!supabaseEnabled && driveResult.status !== 'synced') {
+        parts.push('supabase disabled');
+      }
+      throw new Error(parts.join(' | ') || 'No persistence target succeeded');
     }
 
     return {
       rows: supabaseRows,
       envelope: envelope,
-      drive: driveResult
+      drive: driveResult,
+      supabase: {
+        enabled: supabaseEnabled,
+        saved: supabaseSaved,
+        error: supabaseError ? supabaseError.message : null
+      }
     };
   }
 
@@ -221,6 +265,7 @@
     config: {
       supabaseUrl: getSupabaseUrl(),
       supabaseTable: SUPABASE_TABLE,
+      supabaseEnabled: isSupabaseEnabled(),
       driveWebhookConfigured: Boolean(getDriveWebhookUrl()),
       driveRootFolder: getDriveRootFolder()
     }

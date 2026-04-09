@@ -4,7 +4,8 @@
 
 1. Abre el SQL Editor de tu proyecto Supabase.
 2. Ejecuta `integrations/supabase/psychological_test_results.sql`.
-3. La suite empezara a guardar resultados en la tabla `psychological_test_results`.
+3. Cambia `window.__PSY_ENABLE_SUPABASE` a `true` en `tests/assets/integrations-config.js`.
+4. La suite empezara a guardar resultados en la tabla `psychological_test_results`.
 
 ## Google Drive
 

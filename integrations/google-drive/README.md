@@ -22,4 +22,6 @@ La suite ya carga ese archivo antes de `tests/assets/test-persistence.js`, asi q
 
 ## Nota
 
-Sin esa URL, el sitio seguira guardando en Supabase, pero dejara la sincronizacion a Drive marcada como `skipped`.
+Si Supabase aun no esta listo, puedes dejar `window.__PSY_ENABLE_SUPABASE = false` y la suite trabajara solo con Drive.
+
+Si al probar la URL `/exec` aparece el mensaje `No se encontro la funcion de la secuencia de comandos: doPost`, el despliegue activo no esta apuntando al contenido correcto de `Code.gs`. En ese caso hay que volver a pegar ese archivo y redesplegar el Web App.
