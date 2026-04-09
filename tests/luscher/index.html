@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Test de Lüscher — Versión Abreviada (8 Colores)</title>
+<meta name="description" content="Herramienta profesional para la administración digital del Test de los Colores de Lüscher (versión abreviada de 8 colores)">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-card: #1a1a28;
+  --bg-elevated: #222236;
+  --text-primary: #e8e8f0;
+  --text-secondary: #9898b0;
+  --text-muted: #6868808;
+  --accent-primary: #6366f1;
+  --accent-secondary: #818cf8;
+  --accent-glow: rgba(99, 102, 241, 0.3);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-light: rgba(255, 255, 255, 0.1);
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 100%, rgba(139, 92, 246, 0.06) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 48px 24px 32px;
+  animation: fadeInDown 0.8s ease;
+}
+
+.header .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 16px;
+}
+
+.header h1 {
+  font-size: 2.4em;
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.header p {
+  font-size: 1em;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* Sections / Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 24px;
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+}
+
+.card.visible { opacity: 1; }
+
+.card-title {
+  font-size: 1.2em;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-title .icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background: rgba(99, 102, 241, 0.15);
+}
+
+/* Form */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group.full-width { grid-column: 1 / -1; }
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.form-group input, .form-group select, .form-group textarea {
+  padding: 10px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  transition: var(--transition);
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-primary), #7c3aed);
+  color: white;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px var(--accent-glow);
+}
+
+.btn-secondary {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-card);
+  border-color: var(--accent-primary);
+}
+
+.btn-group {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Color Cards Area */
+.test-area {
+  min-height: 200px;
+  padding: 20px;
+}
+
+.round-info {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.round-info h3 {
+  font-size: 1.1em;
+  color: var(--accent-secondary);
+  margin-bottom: 4px;
+}
+
+.round-info p {
+  font-size: 0.9em;
+  color: var(--text-secondary);
+}
+
+.instruction-text {
+  text-align: center;
+  padding: 16px;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: var(--radius-md);
+  margin-bottom: 24px;
+  font-size: 0.95em;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.colors-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 32px;
+  min-height: 130px;
+  padding: 16px;
+  border: 2px dashed var(--border-light);
+  border-radius: var(--radius-lg);
+  transition: var(--transition);
+}
+
+.colors-pool.drag-over {
+  border-color: var(--accent-primary);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.color-card {
+  width: 100px;
+  height: 120px;
+  border-radius: var(--radius-md);
+  cursor: grab;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: var(--shadow-md);
+  border: 3px solid transparent;
+}
+
+.color-card:hover {
+  transform: scale(1.08) translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.color-card:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+}
+
+.color-card.dragging {
+  opacity: 0.5;
+  transform: scale(0.9);
+}
+
+.color-card .color-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 6px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  border-radius: 0 0 9px 9px;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.selected-order {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 16px;
+  min-height: 80px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border-light);
+  margin-bottom: 16px;
+}
+
+.selected-order.drag-over {
+  border-color: var(--accent-primary);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.order-slot {
+  width: 60px;
+  height: 70px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  border: 2px dashed var(--border-light);
+  position: relative;
+}
+
+.order-slot .position-label {
+  position: absolute;
+  top: -10px;
+  font-size: 10px;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  padding: 0 4px;
+}
+
+.order-slot.filled {
+  border: none;
+  cursor: pointer;
+}
+
+.order-slot.filled:hover {
+  opacity: 0.8;
+}
+
+.order-labels {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.order-labels span {
+  width: 60px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 0;
+  border-radius: 4px;
+}
+
+.order-labels .pref { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+.order-labels .actual { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+.order-labels .latent { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.order-labels .reject { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+/* Progress */
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-elevated);
+  border-radius: 2px;
+  margin: 16px 0;
+  overflow: hidden;
+}
+
+.progress-bar .fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), #7c3aed);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* Results */
+.result-section {
+  margin-bottom: 24px;
+}
+
+.result-section h3 {
+  font-size: 1.05em;
+  font-weight: 700;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--accent-secondary);
+}
+
+.sequence-display {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.seq-item {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  position: relative;
+  box-shadow: var(--shadow-sm);
+}
+
+.seq-item .pos-marker {
+  position: absolute;
+  top: -8px;
+  right: -4px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+}
+
+.interpretation-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.interp-row {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  border-left: 4px solid;
+  align-items: flex-start;
+}
+
+.interp-row .position-name {
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 120px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.interp-row .colors-pair {
+  display: flex;
+  gap: 4px;
+  min-width: 50px;
+}
+
+.interp-row .color-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+
+.interp-row .interp-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.conflict-alert {
+  padding: 14px 18px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-sm);
+  margin-top: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.conflict-alert .alert-icon { font-size: 18px; }
+.conflict-alert .alert-text { font-size: 13px; color: #fca5a5; line-height: 1.5; }
+
+.no-conflict {
+  padding: 14px 18px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: var(--radius-sm);
+  margin-top: 12px;
+  font-size: 13px;
+  color: #86efac;
+}
+
+/* Patient info in report */
+.patient-info-report {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 16px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+}
+
+.patient-info-report .info-item {
+  font-size: 13px;
+}
+
+.patient-info-report .info-item span {
+  color: var(--text-secondary);
+}
+
+.patient-info-report .info-item strong {
+  color: var(--text-primary);
+}
+
+/* Stepper */
+.stepper {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 32px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.step-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--bg-elevated);
+  border: 2px solid var(--border-light);
+  color: var(--text-muted);
+  transition: var(--transition);
+}
+
+.step.active .step-dot {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #fff;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.step.done .step-dot {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+
+.step-line {
+  width: 60px;
+  height: 2px;
+  background: var(--border-light);
+  transition: var(--transition);
+}
+
+.step.done + .step .step-line,
+.step.done .step-line {
+  background: var(--success);
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+  50% { box-shadow: 0 0 0 8px transparent; }
+}
+
+.hidden { display: none !important; }
+
+/* Print styles */
+@media print {
+  body { background: #fff; color: #000; }
+  body::before { display: none; }
+  .card { background: #fff; border: 1px solid #ddd; box-shadow: none; }
+  .no-print { display: none !important; }
+  .interp-row { background: #f5f5f5; }
+  .patient-info-report { background: #f5f5f5; }
+  .seq-item .pos-marker { background: #fff; border-color: #ccc; color: #000; }
+  .header h1 { -webkit-text-fill-color: #333; background: none; }
+  .header p, .card-title, .result-section h3 { color: #333; }
+  .interp-row .interp-text, .interp-row .position-name { color: #333; }
+  .conflict-alert { background: #fff3f3; border-color: #f88; }
+  .conflict-alert .alert-text { color: #c00; }
+}
+
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .color-card { width: 70px; height: 85px; }
+  .header h1 { font-size: 1.8em; }
+  .container { padding: 12px; }
+  .card { padding: 20px; }
+  .patient-info-report { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="badge">🎨 Herramienta Profesional</div>
+    <h1>Test de Lüscher</h1>
+    <p>Versión Abreviada — 8 Colores | Max Lüscher (1947)</p>
+  </div>
+
+  <!-- Stepper -->
+  <div class="stepper no-print" id="stepper">
+    <div class="step active" data-step="0">
+      <div class="step-dot">1</div>
+    </div>
+    <div class="step" data-step="1">
+      <div class="step-line"></div>
+      <div class="step-dot">2</div>
+    </div>
+    <div class="step" data-step="2">
+      <div class="step-line"></div>
+      <div class="step-dot">3</div>
+    </div>
+    <div class="step" data-step="3">
+      <div class="step-line"></div>
+      <div class="step-dot">4</div>
+    </div>
+  </div>
+
+  <!-- STEP 0: Patient Info -->
+  <div class="card visible" id="step-patient">
+    <div class="card-title">
+      <div class="icon">📋</div>
+      Datos del Evaluado
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="patientName">Nombre completo</label>
+        <input type="text" id="patientName" placeholder="Ingrese nombre">
+      </div>
+      <div class="form-group">
+        <label for="patientAge">Edad</label>
+        <input type="number" id="patientAge" placeholder="Años" min="5" max="120">
+      </div>
+      <div class="form-group">
+        <label for="patientSex">Sexo</label>
+        <select id="patientSex">
+          <option value="">Seleccionar</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="patientDate">Fecha de aplicación</label>
+        <input type="date" id="patientDate">
+      </div>
+      <div class="form-group">
+        <label for="evaluator">Evaluador</label>
+        <input type="text" id="evaluator" placeholder="Nombre del psicólogo">
+      </div>
+      <div class="form-group">
+        <label for="motive">Motivo de evaluación</label>
+        <input type="text" id="motive" placeholder="Clínico / Laboral / Otro">
+      </div>
+      <div class="form-group full-width">
+        <label for="observations">Observaciones</label>
+        <textarea id="observations" rows="2" placeholder="Observaciones conductuales durante la aplicación..."></textarea>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:20px;">
+      <button class="btn btn-primary" onclick="startTest()">Iniciar Test →</button>
+    </div>
+  </div>
+
+  <!-- STEP 1: Round 1 -->
+  <div class="card hidden" id="step-round1">
+    <div class="card-title">
+      <div class="icon">1️⃣</div>
+      Primera Selección
+    </div>
+    <div class="instruction-text">
+      <strong>Instrucción al evaluado:</strong> "Observe estos colores. Sin pensar en si le gustan en su ropa, decoración o por alguna asociación. 
+      Simplemente elija el color que <em>más le atrae</em> en este momento. Haga clic en él."
+    </div>
+    <div class="round-info">
+      <h3>Seleccione los colores en orden de preferencia</h3>
+      <p>Del que más le atrae al que menos — Quedan: <strong id="remaining1">8</strong></p>
+    </div>
+    <div class="progress-bar"><div class="fill" id="progress1" style="width:0%"></div></div>
+    <div class="order-labels" id="labels1">
+      <span class="pref">++</span><span class="pref">++</span>
+      <span class="actual">××</span><span class="actual">××</span>
+      <span class="latent">==</span><span class="latent">==</span>
+      <span class="reject">− −</span><span class="reject">− −</span>
+    </div>
+    <div class="selected-order" id="selected1"></div>
+    <div class="colors-pool" id="pool1"></div>
+    <div style="text-align:center;">
+      <button class="btn btn-secondary" id="undo1" onclick="undoSelection(1)" disabled>↩ Deshacer último</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Round 2 -->
+  <div class="card hidden" id="step-round2">
+    <div class="card-title">
+      <div class="icon">2️⃣</div>
+      Segunda Selección
+    </div>
+    <div class="instruction-text">
+      <strong>Instrucción:</strong> "Ahora vamos a repetir el mismo procedimiento. Vuelva a elegir los colores en el orden que <em>más le atraigan</em> en este momento. 
+      No intente recordar el orden anterior."
+    </div>
+    <div class="round-info">
+      <h3>Repita la selección en orden de preferencia</h3>
+      <p>Del que más le atrae al que menos — Quedan: <strong id="remaining2">8</strong></p>
+    </div>
+    <div class="progress-bar"><div class="fill" id="progress2" style="width:0%"></div></div>
+    <div class="order-labels" id="labels2">
+      <span class="pref">++</span><span class="pref">++</span>
+      <span class="actual">××</span><span class="actual">××</span>
+      <span class="latent">==</span><span class="latent">==</span>
+      <span class="reject">− −</span><span class="reject">− −</span>
+    </div>
+    <div class="selected-order" id="selected2"></div>
+    <div class="colors-pool" id="pool2"></div>
+    <div style="text-align:center;">
+      <button class="btn btn-secondary" id="undo2" onclick="undoSelection(2)" disabled>↩ Deshacer último</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Results -->
+  <div class="card hidden" id="step-results">
+    <div class="card-title">
+      <div class="icon">📊</div>
+      Informe de Resultados
+    </div>
+
+    <div class="patient-info-report" id="reportPatientInfo"></div>
+
+    <!-- Sequences -->
+    <div class="result-section">
+      <h3>📋 Secuencias de Selección</h3>
+      <p style="font-size:13px; color:var(--text-secondary); margin-bottom:12px;"><strong>1ª Selección:</strong></p>
+      <div class="sequence-display" id="seq1Display"></div>
+      <p style="font-size:13px; color:var(--text-secondary); margin-bottom:12px;"><strong>2ª Selección:</strong></p>
+      <div class="sequence-display" id="seq2Display"></div>
+    </div>
+
+    <!-- Functional Positions -->
+    <div class="result-section">
+      <h3>🔍 Análisis por Posiciones Funcionales</h3>
+      <div class="interpretation-grid" id="positionAnalysis"></div>
+    </div>
+
+    <!-- Conflict Detection -->
+    <div class="result-section">
+      <h3>⚠️ Indicadores de Conflicto</h3>
+      <div id="conflictAnalysis"></div>
+    </div>
+
+    <!-- Consistency -->
+    <div class="result-section">
+      <h3>🔄 Consistencia entre Selecciones</h3>
+      <div id="consistencyAnalysis"></div>
+    </div>
+
+    <!-- Pair Analysis -->
+    <div class="result-section">
+      <h3>🔗 Análisis de Parejas</h3>
+      <div class="interpretation-grid" id="pairAnalysis"></div>
+    </div>
+
+    <!-- Clinical Notes -->
+    <div class="result-section">
+      <h3>📝 Observaciones Clínicas</h3>
+      <div id="clinicalNotes"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="btn-group no-print" style="margin-top:24px;">
+      <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir Informe</button>
+      <button class="btn btn-secondary" onclick="resetTest()">🔄 Nuevo Test</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align:center; padding:24px; color:var(--text-muted); font-size:12px;" class="no-print">
+    <p>Herramienta clínica de apoyo profesional — Test de Lüscher (Versión Abreviada)</p>
+    <p>Los resultados deben ser interpretados por un profesional cualificado dentro de un contexto clínico integral.</p>
+  </div>
+</div>
+
+<script src="../assets/suite-access.js" data-suite-guard="true" data-suite-home="../" data-landing-href="../../index.html"></script>
+<script>
+// ==================== COLOR DATA ====================
+const COLORS = [
+  { id: 0, name: 'Gris',     hex: '#969696', type: 'auxiliar', symbol: '0' },
+  { id: 1, name: 'Azul',     hex: '#004B87', type: 'basico',  symbol: '1' },
+  { id: 2, name: 'Verde',    hex: '#1A7A42', type: 'basico',  symbol: '2' },
+  { id: 3, name: 'Rojo',     hex: '#C62828', type: 'basico',  symbol: '3' },
+  { id: 4, name: 'Amarillo', hex: '#F2B705', type: 'basico',  symbol: '4' },
+  { id: 5, name: 'Violeta',  hex: '#7B2D8E', type: 'auxiliar', symbol: '5' },
+  { id: 6, name: 'Marrón',   hex: '#8B5E3C', type: 'auxiliar', symbol: '6' },
+  { id: 7, name: 'Negro',    hex: '#1a1a1a', type: 'auxiliar', symbol: '7' },
+];
+
+// ==================== COLOR MEANINGS ====================
+const COLOR_MEANINGS = {
+  0: { // Gris
+    name: 'Gris',
+    need: 'Neutralidad / No compromiso',
+    pref: 'Deseo de aislarse, no implicarse, poner una barrera entre sí mismo y el entorno.',
+    reject: 'Deseo de participar, implicarse en todo, no desea quedar excluido.'
+  },
+  1: { // Azul
+    name: 'Azul',
+    need: 'Necesidad de afecto, paz y vínculos',
+    pref: 'Busca tranquilidad, armonía, relación afectiva profunda y estabilidad emocional.',
+    reject: 'Las relaciones afectivas actuales son insatisfactorias o generan inquietud. Rechaza la dependencia emocional.'
+  },
+  2: { // Verde
+    name: 'Verde',
+    need: 'Autoafirmación y control del yo',
+    pref: 'Necesidad de autoafirmación, perseverancia, resistencia, deseo de prestigio y control sobre el entorno.',
+    reject: 'Dificultad para autoafirmarse, sentimientos de impotencia o debilidad del yo ante las exigencias del medio.'
+  },
+  3: { // Rojo
+    name: 'Rojo',
+    need: 'Fuerza vital, acción y éxito',
+    pref: 'Deseo de actividad, experiencias intensas, conquista, éxito, competencia y fuerza de voluntad.',
+    reject: 'Se siente sobre-estimulado, agotado, irritable. Evita la excitación por falta de fuerzas o temor a perder el control.'
+  },
+  4: { // Amarillo
+    name: 'Amarillo',
+    need: 'Proyección, esperanza y apertura',
+    pref: 'Busca alivio del estrés, deseo de cambio, apertura a nuevas posibilidades, optimismo y perspectivas de futuro.',
+    reject: 'Desilusión, desconfianza ante el futuro, sentimiento de que las esperanzas se han frustrado. Actitud defensiva o vigilante.'
+  },
+  5: { // Violeta
+    name: 'Violeta',
+    need: 'Identificación intuitiva / Encantamiento',
+    pref: 'Necesidad de fascinar, de ser admirado. Sensibilidad, inmadurez emocional o deseo de una relación mágica.',
+    reject: 'Capacidad de compromiso emocional auténtico, madurez en las relaciones interpersonales, control racional.'
+  },
+  6: { // Marrón
+    name: 'Marrón',
+    need: 'Bienestar físico y sensorial',
+    pref: 'Necesidad de comodidad física, bienestar corporal, seguridad material. Posible inseguridad o carencia.',
+    reject: 'Poca preocupación por el confort, renuncia a satisfacciones corporales, posible indiferencia hacia la propia salud.'
+  },
+  7: { // Negro
+    name: 'Negro',
+    need: 'Negación, protesta o renuncia',
+    pref: 'Protesta contra la situación actual, rechazo activo o actitud de renuncia extrema, deseo de controlar a través de la negación.',
+    reject: 'Renuncia a la renuncia: no desea privarse de nada, necesidad de que todo sea como desea, exigente.'
+  }
+};
+
+// ==================== PAIR INTERPRETATIONS ====================
+const PAIR_INTERPRETATIONS = {
+  // Preferencias (posiciones 1-2)
+  '1-2': 'Busca armonía emocional a través de la autoafirmación. Necesita relaciones estables donde pueda mantener el control.',
+  '1-3': 'Desea actividad armoniosa. Busca logros a través de la cooperación afectiva.',
+  '1-4': 'Necesita paz interior y apertura a nuevas experiencias. Optimismo afectivo.',
+  '2-1': 'Autoafirmación buscada a través de vínculos seguros. Control emocional.',
+  '2-3': 'Ambicioso y determinado. Busca reconocimiento a través de logros activos.',
+  '2-4': 'Desea reconocimiento y apertura. Necesita que los demás valoren su posición.',
+  '3-1': 'Actividad dirigida hacia relaciones significativas. Pasión emocional.',
+  '3-2': 'Empuje hacia la autoafirmación activa. Voluntad firme y competitiva.',
+  '3-4': 'Actividad expansiva y optimista. Búsqueda entusiasta de nuevas experiencias.',
+  '4-1': 'Esperanza proyectada en vínculos afectivos. Busca relaciones que ofrezcan alivio.',
+  '4-2': 'Optimismo combinado con autocontrol. Planifica cambios de forma metódica.',
+  '4-3': 'Búsqueda activa de novedad y estímulo. Impulsividad orientada al cambio.',
+  // Rechazos (posiciones 7-8)
+  '1-0': 'Angustia existencial: rechaza tanto los vínculos profundos como el compromiso.',
+  '7-1': 'Renuncia a las relaciones afectivas. Aislamiento como protesta o defensa.',
+  '7-2': 'Rebeldía contra las normas y la autoexigencia. Actitud de desafío.',
+  '7-3': 'Agotamiento vital. La energía está dirigida hacia la negación o la protesta.',
+  '0-1': 'Indiferencia afectiva. Bloqueo emocional como mecanismo de defensa.',
+  '0-7': 'Neutralidad extrema. Intenta no dejarse afectar por nada.',
+  // Generic fallback pairs
+  '5-1': 'Sensibilidad dirigida hacia los vínculos. Necesidad de relaciones idealizadas.',
+  '5-3': 'Deseo de fascinar a través de la acción. Búsqueda de impacto emocional.',
+  '6-1': 'Necesidad de seguridad afectiva y bienestar material.',
+  '6-7': 'Bienestar físico amenazado por situación percibida como negativa.',
+  '0-3': 'Evitación del estímulo y la excitación. Necesidad de descanso.',
+};
+
+// ==================== STATE ====================
+let selections = { 1: [], 2: [] };
+let currentRound = 1;
+let currentStep = 0;
+
+// ==================== INITIALIZATION ====================
+function init() {
+  document.getElementById('patientDate').valueAsDate = new Date();
+  renderColorPool(1);
+  renderColorPool(2);
+}
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function renderColorPool(round) {
+  const pool = document.getElementById(`pool${round}`);
+  pool.innerHTML = '';
+  const shuffled = shuffleArray(COLORS);
+  const alreadySelected = selections[round].map(s => s.id);
+
+  shuffled.forEach(color => {
+    if (alreadySelected.includes(color.id)) return;
+    const card = document.createElement('div');
+    card.className = 'color-card';
+    card.style.background = color.hex;
+    card.dataset.colorId = color.id;
+    card.innerHTML = `<span class="color-label">${color.name}</span>`;
+    card.addEventListener('click', () => selectColor(round, color));
+    card.style.animation = 'fadeInUp 0.4s ease forwards';
+    pool.appendChild(card);
+  });
+}
+
+function selectColor(round, color) {
+  selections[round].push(color);
+  updateSelectionDisplay(round);
+  renderColorPool(round);
+
+  const remaining = 8 - selections[round].length;
+  document.getElementById(`remaining${round}`).textContent = remaining;
+  document.getElementById(`progress${round}`).style.width = `${(selections[round].length / 8) * 100}%`;
+  document.getElementById(`undo${round}`).disabled = selections[round].length === 0;
+
+  if (selections[round].length === 8) {
+    setTimeout(() => {
+      if (round === 1) {
+        goToStep(2);
+      } else {
+        generateResults();
+        goToStep(3);
+      }
+    }, 600);
+  }
+}
+
+function undoSelection(round) {
+  if (selections[round].length === 0) return;
+  selections[round].pop();
+  updateSelectionDisplay(round);
+  renderColorPool(round);
+
+  const remaining = 8 - selections[round].length;
+  document.getElementById(`remaining${round}`).textContent = remaining;
+  document.getElementById(`progress${round}`).style.width = `${(selections[round].length / 8) * 100}%`;
+  document.getElementById(`undo${round}`).disabled = selections[round].length === 0;
+}
+
+function updateSelectionDisplay(round) {
+  const container = document.getElementById(`selected${round}`);
+  container.innerHTML = '';
+
+  for (let i = 0; i < 8; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'order-slot' + (i < selections[round].length ? ' filled' : '');
+
+    if (i < selections[round].length) {
+      const c = selections[round][i];
+      slot.style.background = c.hex;
+      slot.innerHTML = `<span style="color:#fff; font-size:10px; font-weight:700; text-shadow:0 1px 3px rgba(0,0,0,0.5);">${c.symbol}</span>`;
+      slot.title = `Posición ${i + 1}: ${c.name}`;
+      slot.addEventListener('click', () => {
+        // Remove this and all after
+        selections[round] = selections[round].slice(0, i);
+        updateSelectionDisplay(round);
+        renderColorPool(round);
+        const remaining = 8 - selections[round].length;
+        document.getElementById(`remaining${round}`).textContent = remaining;
+        document.getElementById(`progress${round}`).style.width = `${(selections[round].length / 8) * 100}%`;
+        document.getElementById(`undo${round}`).disabled = selections[round].length === 0;
+      });
+    } else {
+      slot.innerHTML = `<span class="position-label">${i + 1}°</span>`;
+    }
+
+    container.appendChild(slot);
+  }
+}
+
+// ==================== NAVIGATION ====================
+function goToStep(step) {
+  const steps = ['step-patient', 'step-round1', 'step-round2', 'step-results'];
+  steps.forEach((s, i) => {
+    const el = document.getElementById(s);
+    if (i === step) {
+      el.classList.remove('hidden');
+      el.classList.add('visible');
+    } else {
+      el.classList.add('hidden');
+    }
+  });
+
+  // Update stepper
+  document.querySelectorAll('.stepper .step').forEach((s, i) => {
+    s.classList.remove('active', 'done');
+    if (i < step) s.classList.add('done');
+    if (i === step) s.classList.add('active');
+  });
+
+  currentStep = step;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startTest() {
+  const name = document.getElementById('patientName').value.trim();
+  if (!name) {
+    alert('Por favor, ingrese el nombre del evaluado.');
+    return;
+  }
+  goToStep(1);
+}
+
+// ==================== RESULTS GENERATION ====================
+function generateResults() {
+  const seq = selections[2]; // Use second selection as primary (per protocol)
+  const seq1 = selections[1];
+
+  // Patient info
+  renderPatientReport();
+
+  // Sequence displays
+  renderSequenceDisplay('seq1Display', seq1);
+  renderSequenceDisplay('seq2Display', seq);
+
+  // Position analysis (based on 2nd selection)
+  renderPositionAnalysis(seq);
+
+  // Conflict detection
+  renderConflictAnalysis(seq);
+
+  // Consistency
+  renderConsistencyAnalysis(seq1, seq);
+
+  // Pair analysis
+  renderPairAnalysis(seq);
+
+  // Clinical notes
+  renderClinicalNotes(seq, seq1);
+}
+
+function renderPatientReport() {
+  const container = document.getElementById('reportPatientInfo');
+  const fields = [
+    { label: 'Nombre', value: document.getElementById('patientName').value },
+    { label: 'Edad', value: document.getElementById('patientAge').value + ' años' },
+    { label: 'Sexo', value: document.getElementById('patientSex').value },
+    { label: 'Fecha', value: document.getElementById('patientDate').value },
+    { label: 'Evaluador', value: document.getElementById('evaluator').value || '—' },
+    { label: 'Motivo', value: document.getElementById('motive').value || '—' },
+  ];
+
+  container.innerHTML = fields.map(f =>
+    `<div class="info-item"><span>${f.label}: </span><strong>${f.value || '—'}</strong></div>`
+  ).join('');
+}
+
+function renderSequenceDisplay(containerId, seq) {
+  const container = document.getElementById(containerId);
+  const posLabels = ['++', '++', '××', '××', '==', '==', '− −', '− −'];
+  container.innerHTML = seq.map((c, i) =>
+    `<div class="seq-item" style="background:${c.hex};" title="${c.name}">
+      ${c.symbol}
+      <span class="pos-marker">${posLabels[i]}</span>
+    </div>`
+  ).join('');
+}
+
+function renderPositionAnalysis(seq) {
+  const container = document.getElementById('positionAnalysis');
+  const groups = [
+    { name: 'Preferencias (++)', indices: [0, 1], color: '#22c55e', desc: 'Objetivos y deseos — Lo que busca activamente' },
+    { name: 'Situación Actual (××)', indices: [2, 3], color: '#3b82f6', desc: 'Estado presente — Cómo se siente ahora' },
+    { name: 'Indiferencia (==)', indices: [4, 5], color: '#f59e0b', desc: 'Inclinaciones latentes — Necesidades reprimidas' },
+    { name: 'Rechazos (− −)', indices: [6, 7], color: '#ef4444', desc: 'Ansiedades y conflictos — Lo que evita o teme' },
+  ];
+
+  container.innerHTML = groups.map(g => {
+    const c1 = seq[g.indices[0]];
+    const c2 = seq[g.indices[1]];
+    const isPreference = g.indices[0] < 2;
+    const isReject = g.indices[0] >= 6;
+
+    let interpretation = '';
+    if (isPreference) {
+      interpretation = `<strong>${c1.name}:</strong> ${COLOR_MEANINGS[c1.id].pref}<br><strong>${c2.name}:</strong> ${COLOR_MEANINGS[c2.id].pref}`;
+    } else if (isReject) {
+      interpretation = `<strong>${c1.name}:</strong> ${COLOR_MEANINGS[c1.id].reject}<br><strong>${c2.name}:</strong> ${COLOR_MEANINGS[c2.id].reject}`;
+    } else {
+      const mid = g.indices[0] < 4 ? 'pref' : 'need';
+      interpretation = `<strong>${c1.name}:</strong> ${COLOR_MEANINGS[c1.id].need}<br><strong>${c2.name}:</strong> ${COLOR_MEANINGS[c2.id].need}`;
+    }
+
+    return `<div class="interp-row" style="border-left-color:${g.color}">
+      <div class="position-name" style="color:${g.color}">${g.name}<br><span style="font-weight:400; font-size:11px; color:var(--text-muted)">${g.desc}</span></div>
+      <div class="colors-pair">
+        <div class="color-dot" style="background:${c1.hex}" title="${c1.name}"></div>
+        <div class="color-dot" style="background:${c2.hex}" title="${c2.name}"></div>
+      </div>
+      <div class="interp-text">${interpretation}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderConflictAnalysis(seq) {
+  const container = document.getElementById('conflictAnalysis');
+  const conflicts = [];
+
+  // Basic colors in rejection positions (7-8)
+  const basicIds = [1, 2, 3, 4];
+  for (let i = 6; i < 8; i++) {
+    if (basicIds.includes(seq[i].id)) {
+      conflicts.push({
+        severity: 'high',
+        text: `<strong>${seq[i].name}</strong> (color básico) en posición de rechazo (${i + 1}°): La necesidad fundamental que representa este color (${COLOR_MEANINGS[seq[i].id].need.toLowerCase()}) está frustrada, reprimida o genera ansiedad significativa.`
+      });
+    }
+  }
+
+  // Auxiliary colors in preference positions (1-2)
+  const auxIds = [0, 5, 6, 7];
+  for (let i = 0; i < 2; i++) {
+    if (auxIds.includes(seq[i].id)) {
+      conflicts.push({
+        severity: 'medium',
+        text: `<strong>${seq[i].name}</strong> (color auxiliar) en posición de preferencia (${i + 1}°): Indica un mecanismo compensatorio. El evaluado utiliza ${COLOR_MEANINGS[seq[i].id].need.toLowerCase()} como estrategia para afrontar tensiones o carencias.`
+      });
+    }
+  }
+
+  // Black or Gray in first positions
+  if (seq[0].id === 7) {
+    conflicts.push({
+      severity: 'high',
+      text: `<strong>Negro en primera posición:</strong> Indicador de protesta activa, rechazo intenso de la situación actual o actitud de renuncia extrema. Evaluar posible ansiedad severa o estados depresivos.`
+    });
+  }
+
+  if (seq[0].id === 0) {
+    conflicts.push({
+      severity: 'medium',
+      text: `<strong>Gris en primera posición:</strong> Deseo de aislamiento, no querer comprometerse con nada ni nadie. Posible bloqueo emocional o fatiga psicológica.`
+    });
+  }
+
+  if (conflicts.length === 0) {
+    container.innerHTML = `<div class="no-conflict">✅ No se detectan indicadores de conflicto significativos. Los colores básicos se encuentran en posiciones esperables.</div>`;
+  } else {
+    container.innerHTML = conflicts.map(c =>
+      `<div class="conflict-alert">
+        <span class="alert-icon">${c.severity === 'high' ? '🔴' : '🟡'}</span>
+        <span class="alert-text">${c.text}</span>
+      </div>`
+    ).join('');
+  }
+}
+
+function renderConsistencyAnalysis(seq1, seq2) {
+  const container = document.getElementById('consistencyAnalysis');
+  let differences = 0;
+  const details = [];
+
+  for (let i = 0; i < 8; i++) {
+    const pos1 = seq1.findIndex(c => c.id === seq2[i].id);
+    const diff = Math.abs(pos1 - i);
+    if (diff > 0) differences += diff;
+
+    if (diff >= 3) {
+      details.push(`<strong>${seq2[i].name}</strong>: pasó de posición ${pos1 + 1}° a ${i + 1}° (cambio de ${diff} posiciones)`);
+    }
+  }
+
+  const consistency = differences <= 4 ? 'Alta' : differences <= 8 ? 'Moderada' : 'Baja';
+  const consistColor = differences <= 4 ? '#22c55e' : differences <= 8 ? '#f59e0b' : '#ef4444';
+
+  let html = `<div class="interp-row" style="border-left-color:${consistColor}">
+    <div class="position-name" style="color:${consistColor}">Consistencia: ${consistency}</div>
+    <div class="interp-text">
+      Índice de variación total: <strong>${differences}</strong> posiciones de cambio.
+      ${differences <= 4
+        ? 'Las dos selecciones son consistentes, lo que indica un estado emocional estable durante la evaluación.'
+        : differences <= 8
+          ? 'Se observa variación moderada entre selecciones, sugiriendo cierta ambivalencia o fluctuación emocional.'
+          : 'Alta variabilidad entre selecciones. Puede indicar impulsividad, conflicto interno significativo o falta de compromiso con la tarea.'}
+    </div>
+  </div>`;
+
+  if (details.length > 0) {
+    html += `<div style="margin-top:8px; padding:12px; background:var(--bg-elevated); border-radius:var(--radius-sm); font-size:13px; color:var(--text-secondary);">
+      <strong>Cambios significativos (≥3 posiciones):</strong><br>${details.join('<br>')}
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function renderPairAnalysis(seq) {
+  const container = document.getElementById('pairAnalysis');
+  const pairs = [
+    { label: 'Pareja de Preferencia', i: 0, j: 1, color: '#22c55e' },
+    { label: 'Pareja de Situación Actual', i: 2, j: 3, color: '#3b82f6' },
+    { label: 'Pareja Latente', i: 4, j: 5, color: '#f59e0b' },
+    { label: 'Pareja de Rechazo', i: 6, j: 7, color: '#ef4444' },
+  ];
+
+  container.innerHTML = pairs.map(p => {
+    const c1 = seq[p.i];
+    const c2 = seq[p.j];
+    const key1 = `${c1.symbol}-${c2.symbol}`;
+    const key2 = `${c2.symbol}-${c1.symbol}`;
+
+    let interp = PAIR_INTERPRETATIONS[key1] || PAIR_INTERPRETATIONS[key2] ||
+      `Combinación de ${COLOR_MEANINGS[c1.id].need.toLowerCase()} con ${COLOR_MEANINGS[c2.id].need.toLowerCase()}.`;
+
+    return `<div class="interp-row" style="border-left-color:${p.color}">
+      <div class="position-name" style="color:${p.color}">${p.label}</div>
+      <div class="colors-pair">
+        <div class="color-dot" style="background:${c1.hex}" title="${c1.name}"></div>
+        <div class="color-dot" style="background:${c2.hex}" title="${c2.name}"></div>
+      </div>
+      <div class="interp-text"><strong>${c1.name} + ${c2.name}:</strong> ${interp}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderClinicalNotes(seq, seq1) {
+  const container = document.getElementById('clinicalNotes');
+  const notes = [];
+
+  // Check overall pattern
+  const basicInTop4 = seq.slice(0, 4).filter(c => c.type === 'basico').length;
+  if (basicInTop4 >= 3) {
+    notes.push('✅ Patrón general equilibrado: la mayoría de los colores básicos se ubican en las primeras posiciones, sugiriendo un funcionamiento emocional adaptativo.');
+  } else if (basicInTop4 <= 1) {
+    notes.push('⚠️ Patrón atípico: pocos colores básicos en las primeras posiciones. Se sugiere explorar posibles áreas de conflicto, insatisfacción o mecanismos compensatorios.');
+  }
+
+  // Check specific patterns
+  if (seq[0].id === 3 && seq[1].id === 4) {
+    notes.push('🔥 Patrón expansivo: Rojo + Amarillo en preferencia indica alta necesidad de actividad, estimulación y cambio. Evaluar posible impulsividad.');
+  }
+
+  if (seq[0].id === 1 && seq[1].id === 2) {
+    notes.push('🛡️ Patrón de constricción: Azul + Verde en preferencia indica necesidad de estabilidad, control y paz. Posible evitación de estímulos intensos.');
+  }
+
+  if (seq[6].id === 1 || seq[7].id === 1) {
+    notes.push('💔 Azul en posición de rechazo: sugiere dificultades significativas en el área afectiva. Las relaciones íntimas pueden ser fuente de ansiedad.');
+  }
+
+  if (seq[6].id === 3 || seq[7].id === 3) {
+    notes.push('😰 Rojo en posición de rechazo: posible agotamiento vital, estrés fisiológico o evitación de la confrontación y la actividad intensa.');
+  }
+
+  if (seq[6].id === 4 || seq[7].id === 4) {
+    notes.push('😞 Amarillo en posición de rechazo: desesperanza, decepción ante el futuro, frustración de esperanzas. Evaluar posible componente depresivo.');
+  }
+
+  const obs = document.getElementById('observations').value.trim();
+  if (obs) {
+    notes.push(`📝 <strong>Observaciones del evaluador:</strong> ${obs}`);
+  }
+
+  notes.push('📌 <strong>Nota:</strong> Este informe es una herramienta de apoyo. La interpretación definitiva debe realizarse integrando la historia clínica, la entrevista y otras pruebas del protocolo de evaluación.');
+
+  container.innerHTML = notes.map(n =>
+    `<div style="padding:10px 14px; background:var(--bg-elevated); border-radius:var(--radius-sm); margin-bottom:8px; font-size:13px; color:var(--text-secondary); line-height:1.6;">${n}</div>`
+  ).join('');
+}
+
+// ==================== RESET ====================
+function resetTest() {
+  selections = { 1: [], 2: [] };
+  currentRound = 1;
+  ['remaining1', 'remaining2'].forEach(id => document.getElementById(id).textContent = '8');
+  ['progress1', 'progress2'].forEach(id => document.getElementById(id).style.width = '0%');
+  ['selected1', 'selected2'].forEach(id => document.getElementById(id).innerHTML = '');
+  ['undo1', 'undo2'].forEach(id => document.getElementById(id).disabled = true);
+  renderColorPool(1);
+  renderColorPool(2);
+  goToStep(0);
+}
+
+// Init
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Rorschach — Herramienta de Codificación (Sistema Comprehensivo de Exner)</title>
+<meta name="description" content="Herramienta profesional digital para el registro, codificación e interpretación del Test de Rorschach según el Sistema Comprehensivo de Exner">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#080810;--bg2:#10101c;--bg3:#181828;--bg4:#222238;
+  --text:#e4e4ef;--text2:#9898b5;--text3:#5a5a75;
+  --accent:#6366f1;--accent2:#818cf8;--accentG:rgba(99,102,241,.25);
+  --green:#22c55e;--yellow:#eab308;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;
+  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);
+  --r:10px;--r2:14px;
+  --shadow:0 4px 20px rgba(0,0,0,.5);
+  --mono:'JetBrains Mono',monospace;
+}
+
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 30% 0%,rgba(99,102,241,.06),transparent 50%),radial-gradient(ellipse at 70% 100%,rgba(168,85,247,.04),transparent 50%);pointer-events:none;z-index:0}
+
+/* Layout */
+.app{display:flex;height:100vh;position:relative;z-index:1}
+.sidebar{width:260px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.main-header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2)}
+.main-content{flex:1;overflow-y:auto;padding:24px}
+
+/* Sidebar */
+.sidebar-header{padding:20px 16px;border-bottom:1px solid var(--border)}
+.sidebar-header h1{font-size:1.1em;font-weight:800;background:linear-gradient(135deg,#fff,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sidebar-header p{font-size:11px;color:var(--text3);margin-top:4px}
+
+.lamina-list{padding:8px}
+.lamina-btn{width:100%;padding:10px 14px;border:none;background:transparent;color:var(--text2);font-family:inherit;font-size:13px;cursor:pointer;border-radius:var(--r);display:flex;align-items:center;gap:10px;transition:all .2s;text-align:left;margin-bottom:2px}
+.lamina-btn:hover{background:var(--bg3);color:var(--text)}
+.lamina-btn.active{background:rgba(99,102,241,.15);color:var(--accent2);font-weight:600}
+.lamina-btn .num{width:28px;height:28px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--mono);flex-shrink:0}
+.lamina-btn.active .num{background:var(--accent);color:#fff}
+.lamina-btn .count{margin-left:auto;font-size:11px;background:var(--bg4);padding:2px 8px;border-radius:10px;font-weight:600}
+.lamina-btn.active .count{background:rgba(99,102,241,.3)}
+
+.sidebar-actions{padding:12px 16px;border-top:1px solid var(--border);margin-top:auto}
+
+/* Timer */
+.timer-bar{display:flex;align-items:center;gap:10px;padding:8px 16px;background:var(--bg3);border-bottom:1px solid var(--border);font-size:13px}
+.timer-display{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--accent2);min-width:60px}
+.timer-btn{padding:4px 12px;border:1px solid var(--border2);border-radius:6px;background:transparent;color:var(--text2);cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;transition:all .2s}
+.timer-btn:hover{background:var(--bg4);color:var(--text)}
+.timer-btn.running{border-color:var(--red);color:var(--red)}
+.timer-label{color:var(--text3);font-size:12px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:none;border-radius:var(--r);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;box-shadow:0 3px 12px var(--accentG)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 5px 18px var(--accentG)}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover{background:var(--bg4);color:var(--text)}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.btn-danger:hover{background:rgba(239,68,68,.25)}
+.btn-success{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.2)}
+.btn-success:hover{background:rgba(34,197,94,.25)}
+
+/* Response card */
+.response-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:16px;animation:fadeIn .3s ease}
+.response-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.response-num{font-size:14px;font-weight:700;color:var(--accent2)}
+.response-actions{display:flex;gap:6px}
+
+.coding-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.coding-field{display:flex;flex-direction:column;gap:4px}
+.coding-field label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.coding-field select,.coding-field input,.coding-field textarea{padding:7px 10px;background:var(--bg4);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:inherit;font-size:13px;transition:all .2s}
+.coding-field select:focus,.coding-field input:focus,.coding-field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px var(--accentG)}
+.coding-field.wide{grid-column:1/-1}
+.coding-field textarea{resize:vertical;min-height:40px}
+
+.coding-chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{padding:3px 8px;border:1px solid var(--border2);border-radius:4px;font-size:11px;cursor:pointer;transition:all .15s;background:transparent;color:var(--text2);font-family:inherit;font-weight:500}
+.chip:hover{border-color:var(--accent);color:var(--accent2)}
+.chip.selected{background:rgba(99,102,241,.2);border-color:var(--accent);color:var(--accent2)}
+
+/* Summary */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.summary-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.summary-card h4{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.summary-item{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03)}
+.summary-item .label{color:var(--text2)}
+.summary-item .value{font-weight:600;font-family:var(--mono);color:var(--text)}
+
+.summary-section{margin-bottom:24px}
+.summary-section h3{font-size:1em;font-weight:700;color:var(--accent2);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+/* Index cards */
+.index-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.index-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:12px}
+.index-card .index-status{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.index-card .index-status.positive{background:rgba(239,68,68,.15);color:var(--red)}
+.index-card .index-status.negative{background:rgba(34,197,94,.15);color:var(--green)}
+.index-card .index-info{flex:1}
+.index-card .index-name{font-size:13px;font-weight:600}
+.index-card .index-detail{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* Empty state */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-state .icon{font-size:48px;margin-bottom:12px;opacity:.5}
+.empty-state p{font-size:14px;margin-bottom:4px}
+
+/* Form section (patient info) */
+.patient-form{max-width:700px;margin:0 auto}
+.form-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group2{display:flex;flex-direction:column;gap:4px}
+.form-group2.full{grid-column:1/-1}
+.form-group2 label{font-size:12px;font-weight:500;color:var(--text2)}
+.form-group2 input,.form-group2 select,.form-group2 textarea{padding:8px 12px;background:var(--bg4);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:inherit;font-size:13px;transition:all .2s}
+.form-group2 input:focus,.form-group2 select:focus,.form-group2 textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px var(--accentG)}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;padding:4px;background:var(--bg3);border-radius:var(--r);margin-bottom:20px}
+.tab{padding:8px 16px;border:none;background:transparent;color:var(--text2);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;border-radius:6px;transition:all .2s}
+.tab:hover{color:var(--text)}
+.tab.active{background:var(--accent);color:#fff}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:28px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto}
+.modal h3{font-size:1.1em;font-weight:700;margin-bottom:16px}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.hidden{display:none!important}
+
+/* Print */
+@media print{
+  .sidebar,.main-header,.timer-bar,.btn,.response-actions,.tabs,.no-print{display:none!important}
+  .main{overflow:visible}
+  .main-content{overflow:visible;padding:20px}
+  body{background:#fff;color:#000}
+  body::before{display:none}
+  .response-card,.summary-card,.index-card{background:#f8f8f8;border-color:#ddd;color:#000;break-inside:avoid}
+  .coding-field label,.summary-card h4,.summary-section h3{color:#333}
+  .summary-item .label{color:#555}
+  .summary-item .value{color:#000}
+}
+
+@media(max-width:768px){
+  .sidebar{width:200px}
+  .coding-grid{grid-template-columns:1fr}
+  .summary-grid{grid-template-columns:1fr}
+  .form-grid2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h1>🧠 Rorschach</h1>
+      <p>Sistema Comprehensivo — Exner</p>
+    </div>
+
+    <div style="padding:12px 16px 4px;">
+      <button class="btn btn-primary btn-sm" style="width:100%" onclick="showPatientModal()">📋 Datos del Evaluado</button>
+    </div>
+
+    <div class="lamina-list" id="laminaList"></div>
+
+    <div class="sidebar-actions">
+      <button class="btn btn-success btn-sm" style="width:100%;margin-bottom:6px" onclick="showView('summary')">📊 Sumario Estructural</button>
+      <button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:6px" onclick="exportData()">💾 Exportar JSON</button>
+      <button class="btn btn-ghost btn-sm" style="width:100%" onclick="window.print()">🖨️ Imprimir</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <!-- Header -->
+    <div class="main-header">
+      <div>
+        <span style="font-weight:700;font-size:15px" id="currentLaminaTitle">Lámina I</span>
+        <span style="font-size:12px;color:var(--text3);margin-left:8px" id="laminaDescription">Monocromática</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:12px;color:var(--text2)" id="totalResponses">Total: 0 respuestas</span>
+        <button class="btn btn-primary btn-sm" onclick="addResponse()">+ Respuesta</button>
+      </div>
+    </div>
+
+    <!-- Timer -->
+    <div class="timer-bar">
+      <span class="timer-label">Tiempo de reacción:</span>
+      <span class="timer-display" id="timerDisplay">00:00</span>
+      <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ Iniciar</button>
+      <button class="timer-btn" onclick="resetTimer()">↺ Reset</button>
+      <span style="flex:1"></span>
+      <span class="timer-label" id="trLabel"></span>
+    </div>
+
+    <!-- Content -->
+    <div class="main-content" id="mainContent">
+      <!-- Responses view (default) -->
+      <div id="responsesView">
+        <div class="empty-state" id="emptyState">
+          <div class="icon">📝</div>
+          <p>No hay respuestas registradas para esta lámina</p>
+          <p style="font-size:12px">Presione "+ Respuesta" para agregar una nueva respuesta</p>
+        </div>
+        <div id="responsesList"></div>
+      </div>
+
+      <!-- Summary view -->
+      <div id="summaryView" class="hidden"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Patient Modal -->
+<div class="modal-overlay" id="patientModal">
+  <div class="modal">
+    <h3>📋 Datos del Evaluado</h3>
+    <div class="form-grid2">
+      <div class="form-group2"><label>Nombre</label><input type="text" id="pName" placeholder="Nombre completo"></div>
+      <div class="form-group2"><label>Edad</label><input type="number" id="pAge" placeholder="Años"></div>
+      <div class="form-group2"><label>Sexo</label>
+        <select id="pSex"><option value="">—</option><option>Masculino</option><option>Femenino</option><option>Otro</option></select>
+      </div>
+      <div class="form-group2"><label>Fecha</label><input type="date" id="pDate"></div>
+      <div class="form-group2"><label>Evaluador</label><input type="text" id="pEval" placeholder="Psicólogo"></div>
+      <div class="form-group2"><label>Motivo</label><input type="text" id="pMotivo" placeholder="Motivo de evaluación"></div>
+      <div class="form-group2 full"><label>Observaciones</label><textarea id="pObs" rows="2" placeholder="Conducta durante la prueba..."></textarea></div>
+    </div>
+    <div style="text-align:right;margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost btn-sm" onclick="closePatientModal()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="savePatientInfo()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/suite-access.js" data-suite-guard="true" data-suite-home="../" data-landing-href="../../index.html"></script>
+<script>
+// ==================== CONSTANTS ====================
+const LAMINAS = [
+  { num: 'I',    desc: 'Monocromática', achromatic: true },
+  { num: 'II',   desc: 'Rojo + Negro', achromatic: false },
+  { num: 'III',  desc: 'Rojo + Negro', achromatic: false },
+  { num: 'IV',   desc: 'Monocromática (sombreado)', achromatic: true },
+  { num: 'V',    desc: 'Monocromática', achromatic: true },
+  { num: 'VI',   desc: 'Monocromática (sombreado/textura)', achromatic: true },
+  { num: 'VII',  desc: 'Monocromática', achromatic: true },
+  { num: 'VIII', desc: 'Policromática', achromatic: false },
+  { num: 'IX',   desc: 'Policromática', achromatic: false },
+  { num: 'X',    desc: 'Policromática', achromatic: false },
+];
+
+const LOC_OPTIONS = ['W','D','Dd','DdS','WS','DS','S'];
+const DQ_OPTIONS = ['+','o','v/+','v'];
+const DETERMINANTS = ['F','M','FM','m','FC','CF','C',"FC'","C'F","C'",'FT','TF','T','FV','VF','V','FY','YF','Y','Fr','rF','FD'];
+const FQ_OPTIONS = ['+','o','u','−','none'];
+const CONTENTS = ['H','(H)','Hd','(Hd)','Hx','A','(A)','Ad','(Ad)','An','Art','Ay','Bl','Bt','Cg','Cl','Ex','Fd','Fi','Ge','Hh','Ls','Na','Sc','Sx','Xy','Id'];
+const SPECIALS = ['DV','DV2','INC','INC2','DR','DR2','FAB','FAB2','CON','ALOG','AG','COP','MOR','AB','PER','PSV','GHR','PHR','MAP','COP','AGC'];
+
+// ==================== STATE ====================
+let currentLamina = 0;
+let responses = Array.from({length:10}, ()=>[]);
+let patientInfo = {};
+let timerInterval = null;
+let timerSeconds = 0;
+let timerRunning = false;
+let reactionTimes = Array(10).fill(null);
+
+// ==================== INIT ====================
+function init() {
+  document.getElementById('pDate').valueAsDate = new Date();
+  renderLaminaList();
+  selectLamina(0);
+}
+
+function renderLaminaList() {
+  const list = document.getElementById('laminaList');
+  list.innerHTML = LAMINAS.map((l, i) => 
+    `<button class="lamina-btn${i===currentLamina?' active':''}" onclick="selectLamina(${i})" id="laminaBtn${i}">
+      <span class="num">${l.num}</span>
+      <span>Lámina ${l.num}</span>
+      <span class="count" id="count${i}">${responses[i].length}</span>
+    </button>`
+  ).join('');
+}
+
+function selectLamina(index) {
+  currentLamina = index;
+  document.querySelectorAll('.lamina-btn').forEach((b,i) => {
+    b.classList.toggle('active', i===index);
+  });
+  document.getElementById('currentLaminaTitle').textContent = `Lámina ${LAMINAS[index].num}`;
+  document.getElementById('laminaDescription').textContent = LAMINAS[index].desc;
+  renderResponses();
+  showView('responses');
+  resetTimer();
+  if (reactionTimes[index]) {
+    document.getElementById('trLabel').textContent = `TR: ${formatTime(reactionTimes[index])}`;
+  } else {
+    document.getElementById('trLabel').textContent = '';
+  }
+}
+
+// ==================== TIMER ====================
+function toggleTimer() {
+  if (timerRunning) {
+    stopTimer();
+  } else {
+    startTimer();
+  }
+}
+
+function startTimer() {
+  timerRunning = true;
+  const btn = document.getElementById('timerBtn');
+  btn.textContent = '⏸ Parar';
+  btn.classList.add('running');
+  timerInterval = setInterval(() => {
+    timerSeconds++;
+    document.getElementById('timerDisplay').textContent = formatTime(timerSeconds);
+  }, 1000);
+}
+
+function stopTimer() {
+  timerRunning = false;
+  clearInterval(timerInterval);
+  const btn = document.getElementById('timerBtn');
+  btn.textContent = '▶ Iniciar';
+  btn.classList.remove('running');
+  
+  if (reactionTimes[currentLamina] === null && responses[currentLamina].length === 0) {
+    reactionTimes[currentLamina] = timerSeconds;
+    document.getElementById('trLabel').textContent = `TR: ${formatTime(timerSeconds)}`;
+  }
+}
+
+function resetTimer() {
+  stopTimer();
+  timerSeconds = 0;
+  document.getElementById('timerDisplay').textContent = '00:00';
+}
+
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+// ==================== RESPONSES ====================
+function addResponse() {
+  const r = {
+    id: Date.now(),
+    verbatim: '',
+    inquiry: '',
+    location: '',
+    dq: '',
+    determinants: [],
+    fq: '',
+    contents: [],
+    popular: false,
+    zScore: '',
+    specials: [],
+    pair: false,
+    notes: ''
+  };
+  responses[currentLamina].push(r);
+  renderResponses();
+  updateCounts();
+}
+
+function removeResponse(index) {
+  if (confirm('¿Eliminar esta respuesta?')) {
+    responses[currentLamina].splice(index, 1);
+    renderResponses();
+    updateCounts();
+  }
+}
+
+function renderResponses() {
+  const list = document.getElementById('responsesList');
+  const empty = document.getElementById('emptyState');
+  const resps = responses[currentLamina];
+  
+  if (resps.length === 0) {
+    empty.classList.remove('hidden');
+    list.innerHTML = '';
+    return;
+  }
+  
+  empty.classList.add('hidden');
+
+  // Global response number
+  let globalNum = 0;
+  for (let i = 0; i < currentLamina; i++) globalNum += responses[i].length;
+
+  list.innerHTML = resps.map((r, idx) => {
+    globalNum++;
+    return `<div class="response-card" id="resp-${r.id}">
+      <div class="response-card-header">
+        <span class="response-num">Respuesta ${globalNum} (Lám. ${LAMINAS[currentLamina].num} — R${idx+1})</span>
+        <div class="response-actions">
+          <button class="btn btn-danger btn-sm" onclick="removeResponse(${idx})">✕</button>
+        </div>
+      </div>
+      
+      <!-- Verbatim & Inquiry -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div class="coding-field">
+          <label>Respuesta (Verbatim)</label>
+          <textarea placeholder="Lo que el sujeto dijo..." oninput="updateField(${idx},'verbatim',this.value)">${r.verbatim}</textarea>
+        </div>
+        <div class="coding-field">
+          <label>Interrogatorio</label>
+          <textarea placeholder="Clarificación de localización y determinantes..." oninput="updateField(${idx},'inquiry',this.value)">${r.inquiry}</textarea>
+        </div>
+      </div>
+
+      <!-- Coding Grid -->
+      <div class="coding-grid">
+        <div class="coding-field">
+          <label>Localización</label>
+          <select onchange="updateField(${idx},'location',this.value)">
+            <option value="">—</option>
+            ${LOC_OPTIONS.map(o => `<option ${r.location===o?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div class="coding-field">
+          <label>Cal. Evolutiva (DQ)</label>
+          <select onchange="updateField(${idx},'dq',this.value)">
+            <option value="">—</option>
+            ${DQ_OPTIONS.map(o => `<option ${r.dq===o?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div class="coding-field">
+          <label>Cal. Formal (FQ)</label>
+          <select onchange="updateField(${idx},'fq',this.value)">
+            <option value="">—</option>
+            ${FQ_OPTIONS.map(o => `<option ${r.fq===o?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div class="coding-field">
+          <label>Puntuación Z</label>
+          <input type="number" step="0.5" placeholder="Zf" value="${r.zScore}" oninput="updateField(${idx},'zScore',this.value)">
+        </div>
+        <div class="coding-field">
+          <label>Par (2)</label>
+          <select onchange="updateField(${idx},'pair',this.value==='true')">
+            <option value="false" ${!r.pair?'selected':''}>No</option>
+            <option value="true" ${r.pair?'selected':''}>Sí</option>
+          </select>
+        </div>
+        <div class="coding-field">
+          <label>Popular (P)</label>
+          <select onchange="updateField(${idx},'popular',this.value==='true')">
+            <option value="false" ${!r.popular?'selected':''}>No</option>
+            <option value="true" ${r.popular?'selected':''}>Sí</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Determinants -->
+      <div class="coding-field" style="margin-top:14px">
+        <label>Determinantes</label>
+        <div class="coding-chips">
+          ${DETERMINANTS.map(d => 
+            `<button class="chip${r.determinants.includes(d)?' selected':''}" onclick="toggleArrayField(${idx},'determinants','${d}')">${d}</button>`
+          ).join('')}
+        </div>
+      </div>
+
+      <!-- Contents -->
+      <div class="coding-field" style="margin-top:10px">
+        <label>Contenido</label>
+        <div class="coding-chips">
+          ${CONTENTS.map(c => 
+            `<button class="chip${r.contents.includes(c)?' selected':''}" onclick="toggleArrayField(${idx},'contents','${c}')">${c}</button>`
+          ).join('')}
+        </div>
+      </div>
+
+      <!-- Special Scores -->
+      <div class="coding-field" style="margin-top:10px">
+        <label>Códigos Especiales</label>
+        <div class="coding-chips">
+          ${SPECIALS.map(s => 
+            `<button class="chip${r.specials.includes(s)?' selected':''}" onclick="toggleArrayField(${idx},'specials','${s}')">${s}</button>`
+          ).join('')}
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="coding-field" style="margin-top:10px">
+        <label>Notas clínicas</label>
+        <input type="text" placeholder="Observaciones adicionales..." value="${r.notes||''}" oninput="updateField(${idx},'notes',this.value)">
+      </div>
+
+      <!-- Coded Summary Line -->
+      <div style="margin-top:12px;padding:8px 12px;background:var(--bg);border-radius:6px;font-family:var(--mono);font-size:12px;color:var(--accent2)">
+        ${buildCodeLine(r)}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function buildCodeLine(r) {
+  const parts = [];
+  if (r.location) parts.push(r.location);
+  if (r.dq) parts.push(`DQ:${r.dq}`);
+  if (r.determinants.length) parts.push(r.determinants.join('.'));
+  if (r.fq) parts.push(`FQ${r.fq}`);
+  if (r.pair) parts.push('(2)');
+  if (r.contents.length) parts.push(r.contents.join(','));
+  if (r.popular) parts.push('P');
+  if (r.zScore) parts.push(`Z=${r.zScore}`);
+  if (r.specials.length) parts.push(r.specials.join(','));
+  return parts.length > 0 ? parts.join(' &nbsp;|&nbsp; ') : '<span style="color:var(--text3)">Sin codificar</span>';
+}
+
+function updateField(idx, field, value) {
+  responses[currentLamina][idx][field] = value;
+  // Update code line
+  const r = responses[currentLamina][idx];
+  const card = document.getElementById(`resp-${r.id}`);
+  if (card) {
+    const codeLine = card.querySelector('[style*="font-family:var(--mono)"]');
+    if (codeLine) codeLine.innerHTML = buildCodeLine(r);
+  }
+}
+
+function toggleArrayField(idx, field, value) {
+  const arr = responses[currentLamina][idx][field];
+  const i = arr.indexOf(value);
+  if (i >= 0) arr.splice(i, 1);
+  else arr.push(value);
+  renderResponses();
+}
+
+function updateCounts() {
+  for (let i = 0; i < 10; i++) {
+    const el = document.getElementById(`count${i}`);
+    if (el) el.textContent = responses[i].length;
+  }
+  const total = responses.reduce((s, r) => s + r.length, 0);
+  document.getElementById('totalResponses').textContent = `Total: ${total} respuestas`;
+}
+
+// ==================== VIEWS ====================
+function showView(view) {
+  if (view === 'responses') {
+    document.getElementById('responsesView').classList.remove('hidden');
+    document.getElementById('summaryView').classList.add('hidden');
+  } else {
+    document.getElementById('responsesView').classList.add('hidden');
+    document.getElementById('summaryView').classList.remove('hidden');
+    generateSummary();
+  }
+}
+
+// ==================== STRUCTURAL SUMMARY ====================
+function generateSummary() {
+  const allR = responses.flat();
+  const R = allR.length;
+  
+  if (R === 0) {
+    document.getElementById('summaryView').innerHTML = '<div class="empty-state"><div class="icon">📊</div><p>No hay respuestas para generar el sumario</p></div>';
+    return;
+  }
+
+  // Count functions
+  const countLoc = (loc) => allR.filter(r => r.location === loc).length;
+  const countDet = (det) => allR.filter(r => r.determinants.includes(det)).length;
+  const countCont = (cont) => allR.filter(r => r.contents.includes(cont)).length;
+  const countFQ = (fq) => allR.filter(r => r.fq === fq).length;
+  const countSpec = (sp) => allR.filter(r => r.specials.includes(sp)).length;
+  const countDQ = (dq) => allR.filter(r => r.dq === dq).length;
+
+  // Core calculations
+  const W = countLoc('W') + countLoc('WS');
+  const D = countLoc('D') + countLoc('DS');
+  const Dd = countLoc('Dd') + countLoc('DdS');
+  const S = allR.filter(r => r.location && r.location.includes('S')).length;
+
+  const M = countDet('M');
+  const FM = countDet('FM');
+  const m = countDet('m');
+  const FC = countDet('FC');
+  const CF = countDet('CF');
+  const C = countDet('C');
+  const Cn = 0;
+  const FCp = countDet("FC'");
+  const CpF = countDet("C'F");
+  const Cp = countDet("C'");
+  const FT = countDet('FT');
+  const TF = countDet('TF');
+  const T = countDet('T');
+  const FV = countDet('FV');
+  const VF = countDet('VF');
+  const V = countDet('V');
+  const FY = countDet('FY');
+  const YF = countDet('YF');
+  const Y = countDet('Y');
+  const Fr = countDet('Fr');
+  const rF = countDet('rF');
+  const FD = countDet('FD');
+  const F = countDet('F');
+
+  // Weighted sums
+  const WSumC = FC * 0.5 + CF * 1.0 + C * 1.5;
+  const SumC_prime = FCp + CpF + Cp;
+  const SumT = FT + TF + T;
+  const SumV = FV + VF + V;
+  const SumY = FY + YF + Y;
+  const SumShading = SumT + SumV + SumY;
+
+  // EB, ea, es
+  const EA = M + WSumC;
+  const es = FM + m + SumC_prime + SumT + SumV + SumY;
+  const D_score = EA - es; // Simplified
+
+  // Lambda
+  const pureF = allR.filter(r => r.determinants.length === 1 && r.determinants[0] === 'F').length;
+  const Lambda = R - pureF > 0 ? (pureF / (R - pureF)).toFixed(2) : '∞';
+
+  // Afr (Affective Ratio)
+  const lastThree = responses[7].length + responses[8].length + responses[9].length;
+  const firstSeven = R - lastThree;
+  const Afr = firstSeven > 0 ? (lastThree / firstSeven).toFixed(2) : '0.00';
+
+  // Form Quality
+  const FQplus = countFQ('+');
+  const FQo = countFQ('o');
+  const FQu = countFQ('u');
+  const FQminus = countFQ('−');
+  const FQnone = countFQ('none');
+
+  // Contents
+  const H = countCont('H');
+  const Hd = countCont('Hd');
+  const Hpar = countCont('(H)');
+  const Hdpar = countCont('(Hd)');
+  const Hx = countCont('Hx');
+  const A_cont = countCont('A');
+  const Ad = countCont('Ad');
+  const An = countCont('An');
+  const Art = countCont('Art');
+  const Bl = countCont('Bl');
+
+  // Populars
+  const P = allR.filter(r => r.popular).length;
+
+  // Pairs
+  const pairs = allR.filter(r => r.pair).length;
+
+  // Z
+  const Zf = allR.filter(r => r.zScore && parseFloat(r.zScore) > 0).length;
+  const ZSum = allR.reduce((s, r) => s + (parseFloat(r.zScore) || 0), 0);
+
+  // Special Scores
+  const DV = countSpec('DV');
+  const DV2 = countSpec('DV2');
+  const INC = countSpec('INC');
+  const INC2 = countSpec('INC2');
+  const DR = countSpec('DR');
+  const DR2 = countSpec('DR2');
+  const FAB = countSpec('FAB');
+  const FAB2 = countSpec('FAB2');
+  const CON = countSpec('CON');
+  const ALOG = countSpec('ALOG');
+  const Sum6 = DV + DV2 + INC + INC2 + DR + DR2 + FAB + FAB2 + CON + ALOG;
+  const WSum6 = DV*1 + DV2*2 + INC*2 + INC2*4 + DR*3 + DR2*6 + FAB*4 + FAB2*7 + CON*7 + ALOG*5;
+  const AG = countSpec('AG');
+  const COP_spec = countSpec('COP');
+  const MOR = countSpec('MOR');
+  const AB = countSpec('AB');
+  const PER = countSpec('PER');
+  const PSV = countSpec('PSV');
+  const GHR = countSpec('GHR');
+  const PHR = countSpec('PHR');
+
+  // Reaction times
+  const avgTR = reactionTimes.filter(t => t !== null);
+  const avgTRval = avgTR.length > 0 ? (avgTR.reduce((a,b) => a+b, 0) / avgTR.length).toFixed(1) : '—';
+
+  // Build HTML
+  document.getElementById('summaryView').innerHTML = `
+    <div style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center">
+      <h2 style="font-size:1.3em;font-weight:800;background:linear-gradient(135deg,#fff,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Sumario Estructural</h2>
+      <button class="btn btn-ghost btn-sm no-print" onclick="showView('responses')">← Volver a Respuestas</button>
+    </div>
+
+    <!-- Patient Info -->
+    ${patientInfo.name ? `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px;background:var(--bg3);border-radius:var(--r);margin-bottom:20px;font-size:13px">
+      <div><span style="color:var(--text3)">Nombre:</span> <strong>${patientInfo.name||'—'}</strong></div>
+      <div><span style="color:var(--text3)">Edad:</span> <strong>${patientInfo.age||'—'}</strong></div>
+      <div><span style="color:var(--text3)">Sexo:</span> <strong>${patientInfo.sex||'—'}</strong></div>
+      <div><span style="color:var(--text3)">Fecha:</span> <strong>${patientInfo.date||'—'}</strong></div>
+      <div><span style="color:var(--text3)">Evaluador:</span> <strong>${patientInfo.evaluator||'—'}</strong></div>
+      <div><span style="color:var(--text3)">R Total:</span> <strong>${R}</strong></div>
+    </div>` : ''}
+
+    <!-- Core Section -->
+    <div class="summary-section">
+      <h3>📐 Sección Central</h3>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <h4>Localización</h4>
+          ${summaryRow('W', W)}${summaryRow('D', D)}${summaryRow('Dd', Dd)}${summaryRow('S', S)}
+          ${summaryRow('W : D : Dd', `${W} : ${D} : ${Dd}`)}
+        </div>
+        <div class="summary-card">
+          <h4>Calidad Evolutiva (DQ)</h4>
+          ${summaryRow('+', countDQ('+'))}${summaryRow('o', countDQ('o'))}${summaryRow('v/+', countDQ('v/+'))}${summaryRow('v', countDQ('v'))}
+        </div>
+        <div class="summary-card">
+          <h4>Calidad Formal (FQ)</h4>
+          ${summaryRow('FQ+', FQplus)}${summaryRow('FQo', FQo)}${summaryRow('FQu', FQu)}${summaryRow('FQ−', FQminus)}${summaryRow('FQnone', FQnone)}
+        </div>
+        <div class="summary-card">
+          <h4>Proporciones Clave</h4>
+          ${summaryRow('R (Total)', R)}${summaryRow('Lambda (L)', Lambda)}${summaryRow('F Pura', pureF)}
+          ${summaryRow('EB (M:WSumC)', `${M} : ${WSumC.toFixed(1)}`)}
+          ${summaryRow('EA', EA.toFixed(1))}${summaryRow('es', es)}
+        </div>
+      </div>
+    </div>
+
+    <!-- Determinants -->
+    <div class="summary-section">
+      <h3>🔬 Determinantes</h3>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <h4>Movimiento</h4>
+          ${summaryRow('M', M)}${summaryRow('FM', FM)}${summaryRow('m', m)}
+        </div>
+        <div class="summary-card">
+          <h4>Color Cromático</h4>
+          ${summaryRow('FC', FC)}${summaryRow('CF', CF)}${summaryRow('C', C)}
+          ${summaryRow('WSumC', WSumC.toFixed(1))}
+        </div>
+        <div class="summary-card">
+          <h4>Color Acromático</h4>
+          ${summaryRow("FC'", FCp)}${summaryRow("C'F", CpF)}${summaryRow("C'", Cp)}
+          ${summaryRow("SumC'", SumC_prime)}
+        </div>
+        <div class="summary-card">
+          <h4>Sombreado</h4>
+          ${summaryRow('FT / TF / T', `${FT}/${TF}/${T}`)}
+          ${summaryRow('FV / VF / V', `${FV}/${VF}/${V}`)}
+          ${summaryRow('FY / YF / Y', `${FY}/${YF}/${Y}`)}
+          ${summaryRow('SumT', SumT)}${summaryRow('SumV', SumV)}${summaryRow('SumY', SumY)}
+        </div>
+        <div class="summary-card">
+          <h4>Otros</h4>
+          ${summaryRow('Fr + rF', Fr + rF)}${summaryRow('FD', FD)}${summaryRow('F', F)}
+          ${summaryRow('(2) Pares', pairs)}
+        </div>
+      </div>
+    </div>
+
+    <!-- Contents -->
+    <div class="summary-section">
+      <h3>📦 Contenidos</h3>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <h4>Contenidos Humanos</h4>
+          ${summaryRow('H', H)}${summaryRow('(H)', Hpar)}${summaryRow('Hd', Hd)}${summaryRow('(Hd)', Hdpar)}${summaryRow('Hx', Hx)}
+          ${summaryRow('Σ H puras', H)}${summaryRow('Σ Todo H', H+Hpar+Hd+Hdpar+Hx)}
+        </div>
+        <div class="summary-card">
+          <h4>Contenidos Animales</h4>
+          ${summaryRow('A', A_cont)}${summaryRow('Ad', Ad)}
+          ${summaryRow('Σ A', A_cont + Ad)}
+        </div>
+        <div class="summary-card">
+          <h4>Otros Contenidos</h4>
+          ${summaryRow('An', An)}${summaryRow('Art', Art)}${summaryRow('Bl', Bl)}
+          ${summaryRow('Populares (P)', P)}
+        </div>
+      </div>
+    </div>
+
+    <!-- Special Scores -->
+    <div class="summary-section">
+      <h3>⚡ Códigos Especiales</h3>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <h4>Pensamiento (Lvl 1-2)</h4>
+          ${summaryRow('DV / DV2', `${DV} / ${DV2}`)}
+          ${summaryRow('INC / INC2', `${INC} / ${INC2}`)}
+          ${summaryRow('DR / DR2', `${DR} / ${DR2}`)}
+          ${summaryRow('FAB / FAB2', `${FAB} / ${FAB2}`)}
+          ${summaryRow('CON', CON)}${summaryRow('ALOG', ALOG)}
+          ${summaryRow('Sum6', Sum6)}${summaryRow('WSum6', WSum6)}
+        </div>
+        <div class="summary-card">
+          <h4>Interpersonales</h4>
+          ${summaryRow('COP', COP_spec)}${summaryRow('AG', AG)}
+          ${summaryRow('GHR', GHR)}${summaryRow('PHR', PHR)}
+          ${summaryRow('GHR:PHR', `${GHR}:${PHR}`)}
+          ${summaryRow('PER', PER)}
+        </div>
+        <div class="summary-card">
+          <h4>Otros Especiales</h4>
+          ${summaryRow('MOR', MOR)}${summaryRow('AB', AB)}${summaryRow('PSV', PSV)}
+        </div>
+        <div class="summary-card">
+          <h4>Organización (Z)</h4>
+          ${summaryRow('Zf', Zf)}${summaryRow('ZSum', ZSum.toFixed(1))}
+          ${summaryRow('TR Promedio', avgTRval + 's')}
+          ${summaryRow('Afr', Afr)}
+        </div>
+      </div>
+    </div>
+
+    <!-- Indices -->
+    <div class="summary-section">
+      <h3>📋 Índices / Constelaciones</h3>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:12px">Evaluación orientativa basada en criterios del Sistema Comprehensivo. Se requiere cálculo manual detallado para validación clínica.</p>
+      <div class="index-grid">
+        ${renderIndex('PTI (Percep-Think Index)', WSum6 > 17 || FQminus > R*0.26, `WSum6=${WSum6}, FQ−=${FQminus}`)}
+        ${renderIndex('DEPI (Depresión)', (SumV > 0 && FD > 2) || (MOR >= 3), `SumV=${SumV}, FD=${FD}, MOR=${MOR}`)}
+        ${renderIndex('CDI (Inhabilidad Social)', COP_spec < 2 && AG < 2 && pureF > R*0.5, `COP=${COP_spec}, AG=${AG}, F pura=${pureF}`)}
+        ${renderIndex('S-CON (Suicidio)', FQminus > 3 && SumV > 0 && MOR >= 3, `FQ−=${FQminus}, SumV=${SumV}, MOR=${MOR}`)}
+        ${renderIndex('HVI (Hipervigilancia)', countDet('FT') + countDet('TF') + countDet('T') === 0 && H + Hpar + Hd + Hdpar < 3, `SumT=${SumT}, HumTot=${H+Hpar+Hd+Hdpar}`)}
+        ${renderIndex('OBS (Obsesividad)', countDQ('+') > 3 && FQplus+FQo > R*0.7, `DQ+=${countDQ('+')}, FQ+o=${FQplus+FQo}`)}
+      </div>
+    </div>
+
+    <!-- Reaction Times -->
+    <div class="summary-section">
+      <h3>⏱️ Tiempos de Reacción</h3>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+        ${LAMINAS.map((l, i) => `
+          <div style="padding:10px;background:var(--bg3);border-radius:var(--r);text-align:center;border:1px solid var(--border)">
+            <div style="font-size:11px;color:var(--text3)">Lám. ${l.num}</div>
+            <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:${reactionTimes[i]?'var(--accent2)':'var(--text3)'};margin-top:4px">${reactionTimes[i] ? formatTime(reactionTimes[i]) : '—'}</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px">${responses[i].length}R</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function summaryRow(label, value) {
+  return `<div class="summary-item"><span class="label">${label}</span><span class="value">${value}</span></div>`;
+}
+
+function renderIndex(name, positive, detail) {
+  return `<div class="index-card">
+    <div class="index-status ${positive ? 'positive' : 'negative'}">${positive ? '⚠' : '✓'}</div>
+    <div class="index-info">
+      <div class="index-name">${name}</div>
+      <div class="index-detail">${detail}${positive ? ' — <strong>Positivo</strong>' : ' — Negativo'}</div>
+    </div>
+  </div>`;
+}
+
+// ==================== PATIENT MODAL ====================
+function showPatientModal() {
+  document.getElementById('patientModal').classList.add('show');
+  if (patientInfo.name) {
+    document.getElementById('pName').value = patientInfo.name || '';
+    document.getElementById('pAge').value = patientInfo.age || '';
+    document.getElementById('pSex').value = patientInfo.sex || '';
+    document.getElementById('pDate').value = patientInfo.date || '';
+    document.getElementById('pEval').value = patientInfo.evaluator || '';
+    document.getElementById('pMotivo').value = patientInfo.motive || '';
+    document.getElementById('pObs').value = patientInfo.obs || '';
+  }
+}
+
+function closePatientModal() {
+  document.getElementById('patientModal').classList.remove('show');
+}
+
+function savePatientInfo() {
+  patientInfo = {
+    name: document.getElementById('pName').value,
+    age: document.getElementById('pAge').value,
+    sex: document.getElementById('pSex').value,
+    date: document.getElementById('pDate').value,
+    evaluator: document.getElementById('pEval').value,
+    motive: document.getElementById('pMotivo').value,
+    obs: document.getElementById('pObs').value,
+  };
+  closePatientModal();
+}
+
+// ==================== EXPORT ====================
+function exportData() {
+  const data = {
+    patient: patientInfo,
+    responses: responses,
+    reactionTimes: reactionTimes,
+    exportDate: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `rorschach_${(patientInfo.name||'paciente').replace(/\s/g,'_')}_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Init
+init();
+</script>
+</body>
+</html>
