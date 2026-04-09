@@ -155,25 +155,48 @@
     const supabaseUrl = getSupabaseUrl();
     const supabaseAnonKey = getSupabaseAnonKey();
     const response = await fetch(
-      supabaseUrl + '/rest/v1/' + SUPABASE_TABLE + '?on_conflict=session_id',
+      supabaseUrl + '/rest/v1/' + SUPABASE_TABLE,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'apikey': supabaseAnonKey,
           'Authorization': 'Bearer ' + supabaseAnonKey,
-          'Prefer': 'resolution=merge-duplicates,return=representation'
+          'Prefer': 'return=minimal'
         },
         body: JSON.stringify([envelope])
       }
     );
 
-    if (!response.ok) {
+    if (response.ok) {
+      return { mode: 'inserted' };
+    }
+
+    if (response.status !== 409) {
       const text = await response.text();
       throw new Error('Supabase error: ' + response.status + ' ' + text);
     }
 
-    return response.json();
+    const patchResponse = await fetch(
+      supabaseUrl + '/rest/v1/' + SUPABASE_TABLE + '?session_id=eq.' + encodeURIComponent(envelope.session_id),
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseAnonKey,
+          'Authorization': 'Bearer ' + supabaseAnonKey,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(envelope)
+      }
+    );
+
+    if (!patchResponse.ok) {
+      const patchText = await patchResponse.text();
+      throw new Error('Supabase error: ' + patchResponse.status + ' ' + patchText);
+    }
+
+    return { mode: 'updated' };
   }
 
   async function saveRecord(payload, options) {

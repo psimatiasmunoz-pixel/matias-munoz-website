@@ -21,6 +21,9 @@ create table if not exists public.psychological_test_results (
   updated_at timestamptz not null default now()
 );
 
+grant usage on schema public to anon, authenticated;
+grant select, insert, update on public.psychological_test_results to anon, authenticated;
+
 create index if not exists psychological_test_results_patient_slug_idx
   on public.psychological_test_results (patient_slug);
 
@@ -53,7 +56,7 @@ on public.psychological_test_results;
 create policy psychological_test_results_insert_anon
 on public.psychological_test_results
 for insert
-to anon, authenticated
+to public
 with check (true);
 
 drop policy if exists psychological_test_results_update_anon
@@ -62,7 +65,7 @@ on public.psychological_test_results;
 create policy psychological_test_results_update_anon
 on public.psychological_test_results
 for update
-to anon, authenticated
+to public
 using (true)
 with check (true);
 
