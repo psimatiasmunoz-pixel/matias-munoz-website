@@ -14,4 +14,4 @@
 3. Despliega el script como Web App.
 4. Copia la URL generada y pegala en `tests/assets/integrations-config.js` dentro de `window.__PSY_DRIVE_WEBHOOK_URL`.
 
-La primera vez que llegue un resultado, el script creara en Drive la carpeta `web psicologica`, una subcarpeta por paciente y un archivo JSON por sesion.
+La primera vez que llegue un resultado, el script creara en Drive la carpeta `web psicologica`, una subcarpeta por paciente y un archivo PDF por sesion.
