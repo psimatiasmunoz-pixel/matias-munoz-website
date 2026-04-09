@@ -4,6 +4,11 @@
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // ── Supabase Initialization ──
+  const SUPABASE_URL = 'https://dgdjqsjixcqlyfvjaliu.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_0IvHQ07oUY3Idj_GRpO8pw__gDXAs95';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   // ── Preloader ──
   const preloader = document.getElementById('preloader');
   window.addEventListener('load', () => {
@@ -181,16 +186,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const formSuccess = document.getElementById('formSuccess');
 
   if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Simulate form submission
       const submitBtn = contactForm.querySelector('.form-submit');
       const originalText = submitBtn.innerHTML;
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
       submitBtn.disabled = true;
 
-      setTimeout(() => {
+      // Collect form data
+      const formData = new FormData(contactForm);
+      const data = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        service: formData.get('service'),
+        message: formData.get('message')
+      };
+
+      try {
+        const { error } = await supabaseClient
+          .from('contact_messages')
+          .insert([data]);
+
+        if (error) throw error;
+
+        // Success state
         formWrapper.style.display = 'none';
         formSuccess.classList.add('show');
 
@@ -202,7 +223,13 @@ document.addEventListener('DOMContentLoaded', () => {
           submitBtn.innerHTML = originalText;
           submitBtn.disabled = false;
         }, 5000);
-      }, 1500);
+
+      } catch (error) {
+        console.error('Error sending message:', error);
+        alert('Hubo un error al enviar el mensaje. Por favor, intenta nuevamente o contáctame directamente por WhatsApp.');
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
     });
   }
 
