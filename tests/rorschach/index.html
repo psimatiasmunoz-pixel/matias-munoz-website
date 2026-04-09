@@ -247,6 +247,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </div>
 
 <script src="../assets/suite-access.js" data-suite-guard="true" data-suite-home="../" data-landing-href="../../index.html"></script>
+<script src="../assets/integrations-config.js"></script>
+<script src="../assets/test-persistence.js"></script>
 <script>
 // ==================== CONSTANTS ====================
 const LAMINAS = [
@@ -277,6 +279,8 @@ let timerInterval = null;
 let timerSeconds = 0;
 let timerRunning = false;
 let reactionTimes = Array(10).fill(null);
+const cloudSessionId = window.PsychPersistence ? window.PsychPersistence.getSessionId('rorschach') : null;
+let persistenceTimer = null;
 
 // ==================== INIT ====================
 function init() {
@@ -378,6 +382,7 @@ function addResponse() {
   responses[currentLamina].push(r);
   renderResponses();
   updateCounts();
+  scheduleRorschachSave();
 }
 
 function removeResponse(index) {
@@ -385,6 +390,7 @@ function removeResponse(index) {
     responses[currentLamina].splice(index, 1);
     renderResponses();
     updateCounts();
+    scheduleRorschachSave();
   }
 }
 
@@ -537,6 +543,7 @@ function updateField(idx, field, value) {
     const codeLine = card.querySelector('[style*="font-family:var(--mono)"]');
     if (codeLine) codeLine.innerHTML = buildCodeLine(r);
   }
+  scheduleRorschachSave();
 }
 
 function toggleArrayField(idx, field, value) {
@@ -545,6 +552,7 @@ function toggleArrayField(idx, field, value) {
   if (i >= 0) arr.splice(i, 1);
   else arr.push(value);
   renderResponses();
+  scheduleRorschachSave();
 }
 
 function updateCounts() {
@@ -852,6 +860,7 @@ function generateSummary() {
       </div>
     </div>
   `;
+  persistRorschachResults(true);
 }
 
 function summaryRow(label, value) {
@@ -897,10 +906,51 @@ function savePatientInfo() {
     obs: document.getElementById('pObs').value,
   };
   closePatientModal();
+  scheduleRorschachSave();
+}
+
+function scheduleRorschachSave() {
+  if (!window.PsychPersistence) return;
+  clearTimeout(persistenceTimer);
+  persistenceTimer = window.setTimeout(function () {
+    persistRorschachResults(true);
+  }, 900);
+}
+
+function persistRorschachResults(silent) {
+  if (!window.PsychPersistence) return;
+  if (!patientInfo.name && responses.flat().length === 0) return;
+
+  const summaryText = document.getElementById('summaryView')
+    ? (document.getElementById('summaryView').innerText || '').trim().slice(0, 1200)
+    : '';
+
+  window.PsychPersistence.saveRecord({
+    sessionId: cloudSessionId,
+    testCode: 'rorschach',
+    patient: patientInfo,
+    summary: summaryText,
+    status: responses.flat().length > 0 ? 'in_progress' : 'draft',
+    rawData: {
+      responses: responses,
+      reactionTimes: reactionTimes,
+      currentLamina: currentLamina
+    },
+    resultData: {
+      totalResponses: responses.reduce((sum, item) => sum + item.length, 0),
+      summaryText: summaryText
+    }
+  }, { silent: silent !== false }).catch(function (error) {
+    console.error('Rorschach persistence error:', error);
+    if (!silent) {
+      window.PsychPersistence.toast('No se pudo guardar Rorschach en Supabase.', 'error');
+    }
+  });
 }
 
 // ==================== EXPORT ====================
 function exportData() {
+  persistRorschachResults(true);
   const data = {
     patient: patientInfo,
     responses: responses,

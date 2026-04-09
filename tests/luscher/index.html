@@ -832,6 +832,8 @@ body::before {
 </div>
 
 <script src="../assets/suite-access.js" data-suite-guard="true" data-suite-home="../" data-landing-href="../../index.html"></script>
+<script src="../assets/integrations-config.js"></script>
+<script src="../assets/test-persistence.js"></script>
 <script>
 // ==================== COLOR DATA ====================
 const COLORS = [
@@ -931,6 +933,7 @@ const PAIR_INTERPRETATIONS = {
 let selections = { 1: [], 2: [] };
 let currentRound = 1;
 let currentStep = 0;
+const cloudSessionId = window.PsychPersistence ? window.PsychPersistence.getSessionId('luscher') : null;
 
 // ==================== INITIALIZATION ====================
 function init() {
@@ -1091,6 +1094,43 @@ function generateResults() {
 
   // Clinical notes
   renderClinicalNotes(seq, seq1);
+  persistLuscherResults(seq1, seq);
+}
+
+function persistLuscherResults(seq1, seq2) {
+  if (!window.PsychPersistence) return;
+
+  const patient = {
+    name: document.getElementById('patientName').value.trim(),
+    age: document.getElementById('patientAge').value,
+    sex: document.getElementById('patientSex').value,
+    date: document.getElementById('patientDate').value,
+    evaluator: document.getElementById('evaluator').value.trim(),
+    motive: document.getElementById('motive').value.trim(),
+    observations: document.getElementById('observations').value.trim()
+  };
+
+  const summary = (document.getElementById('clinicalNotes').innerText || '').trim().slice(0, 800);
+
+  window.PsychPersistence.saveRecord({
+    sessionId: cloudSessionId,
+    testCode: 'luscher',
+    patient: patient,
+    summary: summary,
+    rawData: {
+      firstSelection: seq1.map((color) => ({ id: color.id, name: color.name, symbol: color.symbol })),
+      secondSelection: seq2.map((color) => ({ id: color.id, name: color.name, symbol: color.symbol }))
+    },
+    resultData: {
+      preferenceOrder: seq2.map((color) => color.id),
+      clinicalNotes: document.getElementById('clinicalNotes').innerText || '',
+      conflictAnalysis: document.getElementById('conflictAnalysis').innerText || '',
+      consistencyAnalysis: document.getElementById('consistencyAnalysis').innerText || ''
+    }
+  }).catch(function (error) {
+    console.error('Luscher persistence error:', error);
+    window.PsychPersistence.toast('No se pudo guardar el Test de Luscher en Supabase.', 'error');
+  });
 }
 
 function renderPatientReport() {

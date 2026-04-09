@@ -3,6 +3,7 @@ const PER_PAGE = 20;
 let currentPage = 0;
 let answers = new Array(ITEMS.length).fill(null);
 let shuffledIndices = [];
+const cloudSessionId = window.PsychPersistence ? window.PsychPersistence.getSessionId('16pf') : null;
 
 function init() {
   document.getElementById('pDate').valueAsDate = new Date();
@@ -128,7 +129,48 @@ function finishTest() {
   drawRadarChart(decatipos);
   renderGlobalDimensions(globalDims);
   renderInterpretation(decatipos);
+  persist16PFResults(scores, decatipos, globalDims, validity);
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function persist16PFResults(scores, decatipos, globalDims, validity) {
+  if (!window.PsychPersistence) return;
+
+  const patient = {
+    name: document.getElementById('pName').value.trim(),
+    age: document.getElementById('pAge').value,
+    sex: document.getElementById('pSex').value,
+    date: document.getElementById('pDate').value,
+    education: document.getElementById('pEdu').value.trim(),
+    evaluator: document.getElementById('pEval').value.trim(),
+    motive: document.getElementById('pMot').value.trim()
+  };
+
+  const validitySummary = validity.MI.valid && validity.IN.valid && validity.AQ.valid ? 'perfil valido' : 'revisar validez';
+  const summary = [
+    `Validez general: ${validitySummary}`,
+    `Dimension dominante: ${globalDims.slice().sort((a, b) => b.score - a.score)[0].name}`
+  ].join(' | ');
+
+  window.PsychPersistence.saveRecord({
+    sessionId: cloudSessionId,
+    testCode: '16pf',
+    patient: patient,
+    summary: summary,
+    rawData: {
+      answers: answers,
+      shuffledIndices: shuffledIndices
+    },
+    resultData: {
+      scores: scores,
+      decatipos: decatipos,
+      globalDimensions: globalDims,
+      validity: validity
+    }
+  }).catch(function (error) {
+    console.error('16PF persistence error:', error);
+    window.PsychPersistence.toast('No se pudo guardar el 16PF en Supabase.', 'error');
+  });
 }
 
 function calculateScores() {
