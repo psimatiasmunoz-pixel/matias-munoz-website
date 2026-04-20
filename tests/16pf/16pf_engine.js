@@ -129,11 +129,18 @@ function finishTest() {
   drawRadarChart(decatipos);
   renderGlobalDimensions(globalDims);
   renderInterpretation(decatipos);
-  persist16PFResults(scores, decatipos, globalDims, validity);
+
+  // Capturar HTML del informe ANTES de ocultarlo al evaluado
+  let reportHtml = '';
+  if (window.TestFinishGuard) {
+    reportHtml = window.TestFinishGuard.seal('stepResults');
+  }
+
+  persist16PFResults(scores, decatipos, globalDims, validity, reportHtml);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function persist16PFResults(scores, decatipos, globalDims, validity) {
+function persist16PFResults(scores, decatipos, globalDims, validity, reportHtml) {
   if (!window.PsychPersistence) return;
 
   const patient = {
@@ -157,6 +164,7 @@ function persist16PFResults(scores, decatipos, globalDims, validity) {
     testCode: '16pf',
     patient: patient,
     summary: summary,
+    reportHtml: reportHtml || '',
     rawData: {
       answers: answers,
       shuffledIndices: shuffledIndices

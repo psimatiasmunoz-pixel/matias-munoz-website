@@ -114,11 +114,10 @@ canvas{max-width:100%;background:var(--bg4);border-radius:var(--r)}
 <div id="globalDims"></div>
 <h3 style="font-size:1.05em;font-weight:700;color:var(--ac2);margin:20px 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)">📝 Interpretación por Factor</h3>
 <div id="interpSection"></div>
-<div class="btn-g no-print" style="margin-top:24px">
-<button class="btn btn-p" onclick="window.print()">🖨️ Imprimir</button>
-<button class="btn btn-s" onclick="location.reload()">🔄 Nuevo Test</button>
+<div class="btn-g no-print" style="margin-top:24px;display:none">
 </div>
 </div>
+
 
 <div style="text-align:center;padding:20px;color:var(--tx3);font-size:11px" class="no-print">
 <p>Herramienta clínica de apoyo — 16PF-5 | Los resultados requieren interpretación profesional.</p>
@@ -127,6 +126,7 @@ canvas{max-width:100%;background:var(--bg4);border-radius:var(--r)}
 <script src="../assets/suite-access.js" data-suite-guard="true" data-suite-home="../" data-landing-href="../../index.html"></script>
 <script src="../assets/integrations-config.js?v=20260409c"></script>
 <script src="../assets/test-persistence.js?v=20260409c"></script>
+<script src="../assets/test-finish-guard.js"></script>
 <script src="16pf_data.js"></script>
 <script src="16pf_engine.js"></script>
 </body>

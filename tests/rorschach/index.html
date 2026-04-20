@@ -249,6 +249,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <script src="../assets/suite-access.js" data-suite-guard="true" data-suite-home="../" data-landing-href="../../index.html"></script>
 <script src="../assets/integrations-config.js?v=20260409c"></script>
 <script src="../assets/test-persistence.js?v=20260409c"></script>
+<script src="../assets/test-finish-guard.js"></script>
 <script>
 // ==================== CONSTANTS ====================
 const LAMINAS = [
@@ -925,11 +926,21 @@ function persistRorschachResults(silent) {
     ? (document.getElementById('summaryView').innerText || '').trim().slice(0, 1200)
     : '';
 
+  // Capturar HTML del sumario estructural para Drive
+  let reportHtml = '';
+  if (!silent && window.TestFinishGuard) {
+    const summaryEl = document.getElementById('summaryView');
+    if (summaryEl && !summaryEl.classList.contains('hidden')) {
+      reportHtml = window.TestFinishGuard._captureContainerHtml ? window.TestFinishGuard._captureContainerHtml(summaryEl) : '';
+    }
+  }
+
   window.PsychPersistence.saveRecord({
     sessionId: cloudSessionId,
     testCode: 'rorschach',
     patient: patientInfo,
     summary: summaryText,
+    reportHtml: reportHtml,
     status: responses.flat().length > 0 ? 'in_progress' : 'draft',
     rawData: {
       responses: responses,

@@ -817,10 +817,8 @@ body::before {
       <div id="clinicalNotes"></div>
     </div>
 
-    <!-- Actions -->
-    <div class="btn-group no-print" style="margin-top:24px;">
-      <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir Informe</button>
-      <button class="btn btn-secondary" onclick="resetTest()">🔄 Nuevo Test</button>
+    <!-- Botones de acción ocultos al evaluado -->
+    <div class="btn-group no-print" style="margin-top:24px;display:none;">
     </div>
   </div>
 
@@ -834,6 +832,7 @@ body::before {
 <script src="../assets/suite-access.js" data-suite-guard="true" data-suite-home="../" data-landing-href="../../index.html"></script>
 <script src="../assets/integrations-config.js?v=20260409c"></script>
 <script src="../assets/test-persistence.js?v=20260409c"></script>
+<script src="../assets/test-finish-guard.js"></script>
 <script>
 // ==================== COLOR DATA ====================
 const COLORS = [
@@ -1094,10 +1093,17 @@ function generateResults() {
 
   // Clinical notes
   renderClinicalNotes(seq, seq1);
-  persistLuscherResults(seq1, seq);
+
+  // Capturar HTML del informe ANTES de ocultar al evaluado
+  let reportHtml = '';
+  if (window.TestFinishGuard) {
+    reportHtml = window.TestFinishGuard.seal('step-results');
+  }
+
+  persistLuscherResults(seq1, seq, reportHtml);
 }
 
-function persistLuscherResults(seq1, seq2) {
+function persistLuscherResults(seq1, seq2, reportHtml) {
   if (!window.PsychPersistence) return;
 
   const patient = {
@@ -1117,6 +1123,7 @@ function persistLuscherResults(seq1, seq2) {
     testCode: 'luscher',
     patient: patient,
     summary: summary,
+    reportHtml: reportHtml || '',
     rawData: {
       firstSelection: seq1.map((color) => ({ id: color.id, name: color.name, symbol: color.symbol })),
       secondSelection: seq2.map((color) => ({ id: color.id, name: color.name, symbol: color.symbol }))

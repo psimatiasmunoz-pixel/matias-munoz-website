@@ -131,6 +131,7 @@
     const requestBody = {
       rootFolderName: envelope.drive_root_folder,
       patientFolderName: envelope.patient_slug,
+      reportHtml: payload.reportHtml || '',
       payload: envelope
     };
 
