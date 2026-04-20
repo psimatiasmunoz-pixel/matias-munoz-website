@@ -118,7 +118,7 @@
     };
   }
 
-  async function syncToDrive(envelope) {
+  async function syncToDrive(envelope, reportHtml) {
     const driveWebhookUrl = getDriveWebhookUrl();
     if (!driveWebhookUrl) {
       return {
@@ -131,7 +131,7 @@
     const requestBody = {
       rootFolderName: envelope.drive_root_folder,
       patientFolderName: envelope.patient_slug,
-      reportHtml: payload.reportHtml || '',
+      reportHtml: reportHtml || '',
       payload: envelope
     };
 
@@ -232,7 +232,7 @@
     let supabaseError = null;
 
     try {
-      driveResult = await syncToDrive(envelope);
+      driveResult = await syncToDrive(envelope, payload.reportHtml || '');
     } catch (error) {
       driveResult = {
         status: 'error',
