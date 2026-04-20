@@ -7,9 +7,16 @@ let elapsedSeconds = 0;
 const cloudSessionId = window.PsychPersistence ? window.PsychPersistence.getSessionId('raven') : null;
 
 function init() {
+  console.log('Raven Engine Index: initializing...');
   document.getElementById('pDate').valueAsDate = new Date();
   answers = {};
+  if (typeof ITEMS === 'undefined') {
+    console.error('CRITICAL: raven_data.js not loaded or ITEMS is missing.');
+    alert('Error al cargar datos del test. Por favor refresque la página.');
+    return;
+  }
   ITEMS.forEach(item => answers[item.key] = null);
+  console.log('Raven Engine: data loaded, 60 items ready.');
 }
 
 function startTest() {
@@ -44,16 +51,32 @@ function formatTime(s) {
 
 function renderItem() {
   const item = ITEMS[currentIndex];
+  if (!item) {
+    console.error('Item not found at index:', currentIndex);
+    return;
+  }
+  
+  console.log('Rendering item:', item.key);
   document.getElementById('itemKey').textContent = item.key;
   document.getElementById('seriesInfo').textContent = `Serie ${item.series} · Ítem ${item.itemNumber} de 12`;
   document.getElementById('reactivoInfo').textContent = `Reactivo ${currentIndex + 1} de ${ITEMS.length}`;
   
   const img = document.getElementById('itemImage');
+  img.onerror = () => {
+    console.warn('Failed to load image:', item.imagePath);
+    img.alt = '⚠️ Error al cargar imagen: ' + item.imagePath;
+  };
   img.src = item.imagePath;
   img.alt = item.imageAlt;
   
   const optionsGrid = document.getElementById('optionsGrid');
   optionsGrid.innerHTML = '';
+  
+  if (!item.options || !Array.isArray(item.options)) {
+    console.error('Invalid options for item:', item.key);
+    return;
+  }
+
   item.options.forEach(opt => {
     const btn = document.createElement('button');
     btn.className = 'q-opt' + (answers[item.key] === opt ? ' sel' : '');
