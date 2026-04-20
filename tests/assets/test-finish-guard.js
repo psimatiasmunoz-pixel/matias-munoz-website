@@ -118,19 +118,8 @@
     }
   }
 
-  // ------------------------------------------------------------------
   // API pública
-  // ------------------------------------------------------------------
   window.TestFinishGuard = {
-    /**
-     * seal(containerId)
-     *  - Captura el HTML del contenedor de resultados
-     *  - Oculta todos los pasos y muestra la pantalla de agradecimiento
-     *  - Retorna el HTML capturado para incluirlo en el payload de Drive
-     *
-     * @param {string} containerId  ID del div que contiene el informe
-     * @returns {string}            HTML completo del informe
-     */
     seal: function (containerId) {
       var container = document.getElementById(containerId);
       var html = captureReportHtml(container);
@@ -155,6 +144,11 @@
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return html;
+    },
+
+    // Captura HTML de un contenedor sin alterar la vista (útil para Rorschach)
+    _captureContainerHtml: function (containerEl) {
+      return captureReportHtml(containerEl);
     }
   };
 
