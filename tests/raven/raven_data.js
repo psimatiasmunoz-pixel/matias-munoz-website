@@ -113,3 +113,10 @@ const ITEMS = SERIES.flatMap((series) =>
     };
   }),
 );
+
+// Exponer globalmente para garantizar acceso desde raven_engine.js
+window.ITEMS = ITEMS;
+window.DIAGNOSTIC_BANDS = DIAGNOSTIC_BANDS;
+window.PERCENTILE_BY_AGE = PERCENTILE_BY_AGE;
+window.CORRECT_ANSWERS = CORRECT_ANSWERS;
+window.EXPECTED_DISTRIBUTION = EXPECTED_DISTRIBUTION;

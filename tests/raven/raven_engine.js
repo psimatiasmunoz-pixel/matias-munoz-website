@@ -1,22 +1,37 @@
-// Raven Escala General Engine — Scoring, Display, Persistence
+// Engine constants
 let currentIndex = 0;
 let answers = {};
 let startedAt = null;
 let timerInterval = null;
 let elapsedSeconds = 0;
+
+// Detección de ruta base para activos
+const getBaseFolder = () => {
+  const path = window.location.pathname;
+  return path.substring(0, path.lastIndexOf('/') + 1);
+};
+
 const cloudSessionId = window.PsychPersistence ? window.PsychPersistence.getSessionId('raven') : null;
 
 function init() {
-  console.log('Raven Engine Index: initializing...');
+  console.log('Raven Engine: initializing with base path:', getBaseFolder());
   document.getElementById('pDate').valueAsDate = new Date();
   answers = {};
-  if (typeof ITEMS === 'undefined') {
+  
+  // Retry mechanism for global ITEMS
+  const dataItems = window.ITEMS || (typeof ITEMS !== 'undefined' ? ITEMS : null);
+  
+  if (!dataItems) {
     console.error('CRITICAL: raven_data.js not loaded or ITEMS is missing.');
-    alert('Error al cargar datos del test. Por favor refresque la página.');
+    // Try to find it again in 500ms
+    setTimeout(() => {
+      if (window.ITEMS) init();
+    }, 500);
     return;
   }
-  ITEMS.forEach(item => answers[item.key] = null);
-  console.log('Raven Engine: data loaded, 60 items ready.');
+  
+  dataItems.forEach(item => answers[item.key] = null);
+  console.log('Raven Engine: data loaded successfully.');
 }
 
 function startTest() {
@@ -50,23 +65,28 @@ function formatTime(s) {
 }
 
 function renderItem() {
-  const item = ITEMS[currentIndex];
+  const items = window.ITEMS || (typeof ITEMS !== 'undefined' ? ITEMS : []);
+  const item = items[currentIndex];
+  
   if (!item) {
-    console.error('Item not found at index:', currentIndex);
+    console.error('Item not found at index:', currentIndex, 'Total items:', items.length);
     return;
   }
   
-  console.log('Rendering item:', item.key);
+  console.log('Rendering item:', item.key, 'from', getBaseFolder() + item.imagePath);
   document.getElementById('itemKey').textContent = item.key;
   document.getElementById('seriesInfo').textContent = `Serie ${item.series} · Ítem ${item.itemNumber} de 12`;
-  document.getElementById('reactivoInfo').textContent = `Reactivo ${currentIndex + 1} de ${ITEMS.length}`;
+  document.getElementById('reactivoInfo').textContent = `Reactivo ${currentIndex + 1} de ${items.length}`;
   
   const img = document.getElementById('itemImage');
+  const fullPath = getBaseFolder() + item.imagePath;
+  
   img.onerror = () => {
-    console.warn('Failed to load image:', item.imagePath);
+    console.warn('Failed to load image:', fullPath);
     img.alt = '⚠️ Error al cargar imagen: ' + item.imagePath;
   };
-  img.src = item.imagePath;
+  
+  img.src = fullPath;
   img.alt = item.imageAlt;
   
   const optionsGrid = document.getElementById('optionsGrid');
@@ -87,7 +107,7 @@ function renderItem() {
 
   updateProgress();
   document.getElementById('btnPrev').disabled = currentIndex === 0;
-  document.getElementById('btnNext').textContent = currentIndex === ITEMS.length - 1 ? '✓ Finalizar' : 'Siguiente →';
+  document.getElementById('btnNext').textContent = currentIndex === items.length - 1 ? '✓ Finalizar' : 'Siguiente →';
   
   // Quick jump panel update
   renderQuickPanel();
