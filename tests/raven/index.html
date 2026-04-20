@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Raven: Escala General — Matrices Progresivas</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#090910;--bg2:#111120;--bg3:#1a1a2e;--bg4:#24243a;
+      --tx:#e4e4f0;--tx2:#9898b2;--tx3:#5a5a78;
+      --ac:#10a39d;--ac2:#14d2ca;--acG:rgba(16,163,157,0.25);
+      --gn:#22c55e;--yl:#eab308;--rd:#ef4444;--bl:#3b82f6;--r:10px;--r2:14px
+    }
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 0%,rgba(16,163,157,0.07),transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(212,152,42,0.05),transparent 50%);pointer-events:none;z-index:0}
+    .container{max-width:1000px;margin:0 auto;padding:20px;position:relative;z-index:1}
+    .header{text-align:center;padding:40px 20px 24px}
+    .header .badge{display:inline-flex;padding:5px 14px;background:rgba(16,163,157,0.15);border:1px solid rgba(16,163,157,0.3);border-radius:20px;font-size:11px;font-weight:600;color:var(--ac2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+    .header h1{font-size:2.2em;font-weight:800;background:linear-gradient(135deg,#fff,#8be7dc,#10a39d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2;margin-bottom:6px}
+    .header p{font-size:.95em;color:var(--tx2)}
+    
+    .card{background:var(--bg3);border:1px solid rgba(255,255,255,0.06);border-radius:var(--r2);padding:28px;margin-bottom:20px;box-shadow:0 12px 40px rgba(0,0,0,0.2)}
+    .card-title{font-size:1.15em;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .form-group{display:flex;flex-direction:column;gap:5px}
+    .form-group.fw{grid-column:1/-1}
+    .form-group label{font-size:12px;font-weight:500;color:var(--tx2)}
+    .form-group input, .form-group select, .form-group textarea{padding:10px 12px;background:var(--bg4);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--tx);font-family:inherit;font-size:13px;transition:all .2s}
+    .form-group input:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px var(--acG)}
+
+    .btn{display:inline-flex;align-items:center;gap:7px;padding:12px 24px;border:none;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+    .btn-p{background:linear-gradient(135deg,var(--ac),#0d817b);color:#fff;box-shadow:0 4px 14px var(--acG)}
+    .btn-p:hover{transform:translateY(-1px);box-shadow:0 6px 20px var(--acG)}
+    .btn-s{background:var(--bg4);color:var(--tx);border:1px solid rgba(255,255,255,0.1)}
+    
+    .progress-wrap{margin-bottom:24px}
+    .progress-info{display:flex;justify-content:space-between;font-size:12px;color:var(--tx2);margin-bottom:6px}
+    .progress-bar{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--ac),#14d2ca);transition:width .4s}
+
+    /* Application UI */
+    .app-layout { display: grid; grid-template-columns: 1fr 280px; gap: 24px; }
+    .item-display { min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; border-radius: var(--r); padding: 20px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.04); }
+    .item-display img { max-width: 100%; max-height: 55vh; border-radius: 4px; }
+    
+    .options-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; max-width: 500px; margin: 0 auto; }
+    .q-opt { padding: 16px; background: var(--bg4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: var(--tx); font-size: 1.2em; font-weight: 700; cursor: pointer; transition: all .2s; }
+    .q-opt:hover { border-color: var(--ac); background: var(--bg3); }
+    .q-opt.sel { background: var(--ac); color: #fff; border-color: var(--ac); box-shadow: 0 0 20px var(--acG); }
+
+    .quick-panel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .btn-tiny { padding: 8px 4px; border-radius: 6px; background: var(--bg4); border: 1px solid rgba(255,255,255,0.05); color: var(--tx3); font-size: 10px; font-weight: 700; cursor: pointer; }
+    .btn-tiny.answered { background: rgba(34,197,94,0.15); color: var(--gn); border-color: rgba(34,197,94,0.3); }
+    .btn-tiny.current { background: var(--ac); color: #fff; border-color: var(--ac); }
+
+    /* Results */
+    .results-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; }
+    .stat-card { background: var(--bg4); padding: 20px; border-radius: var(--r); text-align: center; }
+    .stat-val { font-size: 2.2em; font-weight: 800; color: var(--ac2); display: block; }
+    .stat-lbl { font-size: 11px; text-transform: uppercase; color: var(--tx2); letter-spacing: 1px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+    th { text-align: left; padding: 10px; color: var(--tx2); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    td.pos { color: var(--gn); font-weight: 600; }
+    td.neg { color: var(--rd); font-weight: 600; }
+
+    .note-box { padding: 14px; border-radius: var(--r); font-size: 13px; margin-top: 12px; line-height: 1.5; }
+    .note-box.ok { background: rgba(34,197,94,0.1); color: #8bedb4; border: 1px solid rgba(34,197,94,0.2); }
+    .note-box.warn { background: rgba(234,179,8,0.1); color: #fdf2a6; border: 1px solid rgba(234,179,8,0.2); }
+
+    .hidden { display: none !important; }
+    
+    @media print { .no-print { display: none !important; } body { background: #fff; color: #000; } .card { border: 1px solid #eee; box-shadow: none; } }
+    @media (max-width: 850px) { .app-layout, .results-grid { grid-template-columns: 1fr; } .options-grid { grid-template-columns: repeat(4, 1fr); } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="badge">Evaluación Profesional</div>
+      <h1>Raven: Escala General</h1>
+      <p>Test de Matrices Progresivas — J.C. Raven | Evaluación de Inteligencia No Verbal</p>
+    </header>
+
+    <!-- Step 0: Patient Info -->
+    <div class="card" id="stepPatient">
+      <div class="card-title">📋 Datos del Evaluado</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Nombre completo</label><input type="text" id="pName" placeholder="Nombre"></div>
+        <div class="form-group"><label>Edad (13-65)</label><input type="number" id="pAge" min="13" max="65" placeholder="Años"></div>
+        <div class="form-group"><label>Cargo / Motivo</label><input type="text" id="pCargo" placeholder="Postulación"></div>
+        <div class="form-group"><label>Fecha</label><input type="date" id="pDate"></div>
+        <div class="form-group fw"><label>Observaciones</label><textarea id="pObs" rows="3" placeholder="Contexto de la aplicación..."></textarea></div>
+      </div>
+      <div style="text-align:center; margin-top:24px;">
+        <button class="btn btn-p" onclick="startTest()">Iniciar Evaluación →</button>
+      </div>
+    </div>
+
+    <!-- Step 1: Application -->
+    <div class="card hidden" id="stepApplication">
+      <div class="app-layout">
+        <div class="main-content">
+          <div class="progress-wrap">
+            <div class="progress-info">
+              <span id="seriesInfo">Serie A · Ítem 1 de 12</span>
+              <span id="timerText">00:00:00</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progBar" style="width:0%"></div></div>
+          </div>
+          
+          <div class="item-display">
+            <img id="itemImage" src="" alt="Lámina Raven">
+          </div>
+          
+          <div class="options-wrap">
+            <div class="options-grid" id="optionsGrid"></div>
+          </div>
+          
+          <div style="display:flex; justify-content:space-between; margin-top:32px;">
+            <button class="btn btn-s" id="btnPrev" onclick="prevPage()">← Anterior</button>
+            <button class="btn btn-p" id="btnNext" onclick="nextPage()">Siguiente →</button>
+          </div>
+        </div>
+        
+        <aside class="sidebar no-print">
+          <div class="card-title" id="reactivoInfo" style="font-size:0.9em; margin-bottom:12px;">Reactivo 1 de 60</div>
+          <div class="progress-info" style="margin-bottom:8px;"><span id="progText">Resp: 0/60</span><span id="progPct">0%</span></div>
+          <div class="quick-panel" id="quickPanel"></div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- Step 2: Results -->
+    <div class="card hidden" id="stepResults">
+      <div class="card-title">📊 Informe de Resultados</div>
+      <div id="patientReport"></div>
+      
+      <div class="results-grid" style="margin-top:24px;">
+        <div class="stats-col">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+            <div class="stat-card"><span class="stat-lbl">Puntaje Directo</span><span class="stat-val" id="statDirect">0</span></div>
+            <div class="stat-card"><span class="stat-lbl">Percentil</span><span class="stat-val" id="statPercentile">0</span></div>
+          </div>
+          
+          <div class="card" style="background:var(--bg4); border:none;">
+            <div class="card-title" style="font-size:1em;">Interpretación Diagnóstica</div>
+            <p style="font-size:1.4em; font-weight:700; color:var(--ac2); margin-top:8px;" id="diagLabel">—</p>
+            <p style="font-size:0.9em; color:var(--tx2); margin-top:4px;" id="diagDetail">—</p>
+          </div>
+        </div>
+        
+        <div class="table-col">
+          <div class="card-title" style="font-size:1em;">Desglose por Series</div>
+          <table>
+            <thead><tr><th>Serie</th><th>Aciertos</th><th>Esperado</th><th>Disc.</th></tr></thead>
+            <tbody id="seriesTableBody"></tbody>
+          </table>
+          <div id="discrepancyNote" class="note-box"></div>
+        </div>
+      </div>
+
+      <div class="no-print" style="text-align:center; margin-top:32px; display:flex; gap:12px; justify-content:center;">
+        <button class="btn btn-p" onclick="window.print()">🖨️ Imprimir Informe</button>
+        <button class="btn btn-s" onclick="location.reload()">🔄 Nuevo Test</button>
+      </div>
+    </div>
+
+    <footer style="text-align:center; padding:40px; color:var(--tx3); font-size:11px;">
+      Herramienta Profesional de Apoyo — Test de Raven | Los resultados requieren validación clínica.
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../assets/suite-access.js" data-suite-guard="true" data-suite-home="../" data-landing-href="../../index.html"></script>
+  <script src="../assets/integrations-config.js"></script>
+  <script src="../assets/test-persistence.js"></script>
+  <script src="raven_data.js"></script>
+  <script src="raven_engine.js"></script>
+</body>
+</html>
